@@ -29,9 +29,12 @@ namespace KirbyMINT
                         Archive archive = new Archive(args[index]);
                         List<uint> hashIds = new List<uint>();
                         List<string> hashNames = new List<string>();
-                        Console.WriteLine("Reading hashes...");
+                        Console.Write("Reading hashes...");
+                        int progress = 0;
                         foreach (KeyValuePair<string, byte[]> pair in archive.files)
                         {
+                            progress++;
+                            Console.Write($"\rReading hashes... {progress}/{archive.files.Count} - {(int)(((float)progress / (float)archive.files.Count) * 100)}%");
                             ScriptHashReader scriptHashReader = new ScriptHashReader(archive.files[pair.Key]);
                             string[] hashes = scriptHashReader.hashes.ToArray();
                             for (int i = 0; i < hashes.Length; i++)
@@ -40,8 +43,8 @@ namespace KirbyMINT
                                 hashNames.Add(string.Join("", hashes[i].Skip(9)));
                             }
                         }
-                        Console.Write("Decompiling scripts...");
-                        int progress = 0;
+                        Console.Write("\nDecompiling scripts...");
+                        progress = 0;
                         foreach (KeyValuePair<string, byte[]> pair in archive.files)
                         {
                             progress++;
@@ -65,9 +68,12 @@ namespace KirbyMINT
                     {
                         Archive archive = new Archive(args[index]);
                         List<string> hashes = new List<string>();
+                        Console.Write("Reading hashes...");
+                        int progress = 0;
                         foreach (KeyValuePair<string, byte[]> pair in archive.files)
                         {
-                            Console.WriteLine("Analyzing script " + pair.Key);
+                            progress++;
+                            Console.Write($"\rReading hashes... {progress}/{archive.files.Count} - {(int)(((float)progress / (float)archive.files.Count) * 100)}%");
                             ScriptHashReader scriptHashReader = new ScriptHashReader(pair.Value);
                             hashes.AddRange(scriptHashReader.hashes);
                         }
@@ -83,6 +89,7 @@ namespace KirbyMINT
                         {
                             File.WriteAllLines(Directory.GetCurrentDirectory() + "\\hash_ksa.txt", hashes);
                         }
+                        Console.WriteLine("\nFinished.");
                     }
                     else if (Directory.Exists(args[index]))
                     {
@@ -91,11 +98,13 @@ namespace KirbyMINT
                         string[] files = Directory.GetFiles(args[index], "*.bin");
                         for (int i = 0; i < files.Length; i++)
                         {
-                            Console.WriteLine("Analyzing Archive " + files[i]);
+                            Console.Write("\nReading hashes from archive " + files[i]);
                             archive = new Archive(files[i]);
+                            int progress = 0;
                             foreach (KeyValuePair<string, byte[]> pair in archive.files)
                             {
-                                Console.WriteLine("Analyzing script " + pair.Key);
+                                progress++;
+                                Console.Write($"\rReading hashes from archive {files[i]} - {progress}/{archive.files.Count} - {(int)(((float)progress / (float)archive.files.Count) * 100)}%");
                                 ScriptHashReader scriptHashReader = new ScriptHashReader(pair.Value);
                                 hashes.AddRange(scriptHashReader.hashes);
                             }
@@ -112,8 +121,7 @@ namespace KirbyMINT
                         {
                             File.WriteAllLines(Directory.GetCurrentDirectory() + "\\hash_ksa.txt", hashes);
                         }
-                        Console.WriteLine("Hashes found: " + hashes.Count);
-                        Console.WriteLine("Files analyzed: " + files.Length);
+                        Console.WriteLine("\nFinished.");
                     }
                 }
             }
