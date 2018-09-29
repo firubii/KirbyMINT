@@ -25,30 +25,28 @@ namespace KirbyMINT
                         if (Directory.Exists(dir))
                             Directory.Delete(dir, true);
                         Directory.CreateDirectory(dir);
+                        Console.WriteLine("Reading archive...");
                         Archive archive = new Archive(args[index]);
-                        string[] hashes = { };
-                        if (archive.game == Game.TDX)
-                        {
-                            if (File.Exists(Directory.GetCurrentDirectory() + "\\hash_tdx.txt"))
-                            {
-                                hashes = File.ReadAllLines(Directory.GetCurrentDirectory() + "\\hash_tdx.txt");
-                            }
-                        }
                         List<uint> hashIds = new List<uint>();
                         List<string> hashNames = new List<string>();
-                        if (hashes.Length > 0)
+                        Console.WriteLine("Reading hashes...");
+                        foreach (KeyValuePair<string, byte[]> pair in archive.files)
                         {
-                            Console.WriteLine("Reading hash database file...");
+                            ScriptHashReader scriptHashReader = new ScriptHashReader(archive.files[pair.Key]);
+                            string[] hashes = scriptHashReader.hashes.ToArray();
                             for (int i = 0; i < hashes.Length; i++)
                             {
                                 hashIds.Add(uint.Parse(string.Join("", hashes[i].Take(8)), System.Globalization.NumberStyles.HexNumber));
                                 hashNames.Add(string.Join("", hashes[i].Skip(9)));
                             }
                         }
+                        Console.Write("Decompiling scripts...");
+                        int progress = 0;
                         foreach (KeyValuePair<string, byte[]> pair in archive.files)
                         {
-                            Console.WriteLine("Dumping script " + pair.Key);
+                            progress++;
                             Script script = new Script(pair.Value, hashIds.ToArray(), hashNames.ToArray());
+                            Console.Write($"\rDecompiling scripts... {progress}/{archive.files.Count} - {(int)(((float)progress / (float)archive.files.Count) * 100)}%");
                             string name = pair.Key;
                             byte[] file = pair.Value;
                             string filedir = dir + "\\" + (name + ".txt").Replace("." + name.Split('.').Last() + ".txt", "").Replace(".", "\\");
@@ -57,6 +55,7 @@ namespace KirbyMINT
                             filedir = dir + "\\" + name.Replace(".", "\\") + ".txt";
                             File.WriteAllLines(filedir, script.script);
                         }
+                        Console.WriteLine("\nFinished.");
                     }
                 }
                 if (args.Contains("-hash"))
