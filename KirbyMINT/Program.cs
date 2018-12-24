@@ -7,6 +7,7 @@ using System.IO;
 using System.Threading;
 using MINT;
 using MINT.TDX;
+using MINT.KSA;
 
 namespace KirbyMINT
 {
@@ -23,45 +24,101 @@ namespace KirbyMINT
                     {
                         string dir = Directory.GetCurrentDirectory() + "\\MINT";
                         if (Directory.Exists(dir))
+                        {
+                            Console.WriteLine("Removing existing directory...");
                             Directory.Delete(dir, true);
+                        }
                         Directory.CreateDirectory(dir);
                         Console.WriteLine("Reading archive...");
                         Archive archive = new Archive(args[index]);
                         List<uint> hashIds = new List<uint>();
                         List<string> hashNames = new List<string>();
                         Console.Write("Reading hashes...");
-                        int progress = 0;
-                        foreach (KeyValuePair<string, byte[]> pair in archive.files)
+                        int progress = 1;
+                        if (args.Contains("-h") && File.Exists(args[args.ToList().IndexOf("-h") + 1]))
                         {
-                            progress++;
-                            Console.Write($"\rReading hashes... {progress}/{archive.files.Count} - {(int)(((float)progress / (float)archive.files.Count) * 100)}%");
-                            ScriptHashReader scriptHashReader = new ScriptHashReader(archive.files[pair.Key]);
-                            string[] hashes = scriptHashReader.hashes.ToArray();
+                            int hindex = args.ToList().IndexOf("-h") + 1;
+                            string[] hashes = File.ReadAllLines(args[hindex]);
                             for (int i = 0; i < hashes.Length; i++)
                             {
                                 hashIds.Add(uint.Parse(string.Join("", hashes[i].Take(8)), System.Globalization.NumberStyles.HexNumber));
                                 hashNames.Add(string.Join("", hashes[i].Skip(9)));
                             }
                         }
+                        else
+                        {
+                            foreach (KeyValuePair<string, byte[]> pair in archive.files)
+                            {
+                                Console.Write($"\rReading hashes... {progress}/{archive.files.Count} - {(int)(((float)progress / (float)archive.files.Count) * 100)}%");
+                                ScriptHashReader scriptHashReader = new ScriptHashReader(archive.files[pair.Key]);
+                                string[] hashes = scriptHashReader.hashes.ToArray();
+                                for (int i = 0; i < hashes.Length; i++)
+                                {
+                                    hashIds.Add(uint.Parse(string.Join("", hashes[i].Take(8)), System.Globalization.NumberStyles.HexNumber));
+                                    hashNames.Add(string.Join("", hashes[i].Skip(9)));
+                                }
+                                progress++;
+                            }
+                        }
                         Console.Write("\nDecompiling scripts...");
-                        progress = 0;
+                        progress = 1;
                         foreach (KeyValuePair<string, byte[]> pair in archive.files)
                         {
-                            progress++;
-                            Script script = new Script(pair.Value, hashIds.ToArray(), hashNames.ToArray());
-                            Console.Write($"\rDecompiling scripts... {progress}/{archive.files.Count} - {(int)(((float)progress / (float)archive.files.Count) * 100)}%");
-                            string name = pair.Key;
-                            byte[] file = pair.Value;
-                            string filedir = dir + "\\" + (name + ".txt").Replace("." + name.Split('.').Last() + ".txt", "").Replace(".", "\\");
-                            if (!Directory.Exists(filedir))
-                                Directory.CreateDirectory(filedir);
-                            filedir = dir + "\\" + name.Replace(".", "\\") + ".txt";
-                            File.WriteAllLines(filedir, script.script);
+                            if (archive.game == Game.TDX)
+                            {
+                                MINT.TDX.Script script = new MINT.TDX.Script(pair.Value, hashIds.ToArray(), hashNames.ToArray());
+                                Console.Write($"\rDecompiling scripts... {progress}/{archive.files.Count} - {(int)(((float)progress / (float)archive.files.Count) * 100)}%");
+                                string name = pair.Key;
+                                byte[] file = pair.Value;
+                                string filedir = dir + "\\" + (name + ".txt").Replace("." + name.Split('.').Last() + ".txt", "").Replace(".", "\\");
+                                if (!Directory.Exists(filedir))
+                                    Directory.CreateDirectory(filedir);
+                                filedir = dir + "\\" + name.Replace(".", "\\") + ".txt";
+                                File.WriteAllLines(filedir, script.script);
+                                progress++;
+                            }
+                            else if (archive.game == Game.KSA)
+                            {
+                                MINT.KSA.Script script = new MINT.KSA.Script(pair.Value, hashIds.ToArray(), hashNames.ToArray());
+                                Console.Write($"\rDecompiling scripts... {progress}/{archive.files.Count} - {(int)(((float)progress / (float)archive.files.Count) * 100)}%");
+                                string name = pair.Key;
+                                byte[] file = pair.Value;
+                                string filedir = dir + "\\" + (name + ".txt").Replace("." + name.Split('.').Last() + ".txt", "").Replace(".", "\\");
+                                if (!Directory.Exists(filedir))
+                                    Directory.CreateDirectory(filedir);
+                                filedir = dir + "\\" + name.Replace(".", "\\") + ".txt";
+                                File.WriteAllLines(filedir, script.script);
+                                progress++;
+                            }
                         }
                         Console.WriteLine("\nFinished.");
                     }
                 }
-                if (args.Contains("-hash"))
+                else if (args.Contains("-bin"))
+                {
+                    int index = args.ToList().IndexOf("-bin") + 1;
+                    if (args[index].EndsWith(".bin") && File.Exists(args[index]))
+                    {
+                        string dir = Directory.GetCurrentDirectory() + "\\BIN";
+                        if (Directory.Exists(dir))
+                        {
+                            Console.WriteLine("Removing existing directory...");
+                            Directory.Delete(dir, true);
+                        }
+                        Directory.CreateDirectory(dir);
+                        Archive archive = new Archive(args[index]);
+                        Console.Write("Extracting files...");
+                        int progress = 1;
+                        foreach (KeyValuePair<string, byte[]> pair in archive.files)
+                        {
+                            Console.Write($"\rExtracting files... {progress}/{archive.files.Count} - {(int)(((float)progress / (float)archive.files.Count) * 100)}%");
+                            File.WriteAllBytes(dir + "\\" + pair.Key + ".bin", pair.Value);
+                            progress++;
+                        }
+                        Console.WriteLine("\nFinished.");
+                    }
+                }
+                else if (args.Contains("-hash"))
                 {
                     int index = args.ToList().IndexOf("-hash") + 1;
                     if (args[index].EndsWith(".bin") && File.Exists(args[index]))
@@ -69,13 +126,13 @@ namespace KirbyMINT
                         Archive archive = new Archive(args[index]);
                         List<string> hashes = new List<string>();
                         Console.Write("Reading hashes...");
-                        int progress = 0;
+                        int progress = 1;
                         foreach (KeyValuePair<string, byte[]> pair in archive.files)
                         {
-                            progress++;
                             Console.Write($"\rReading hashes... {progress}/{archive.files.Count} - {(int)(((float)progress / (float)archive.files.Count) * 100)}%");
                             ScriptHashReader scriptHashReader = new ScriptHashReader(pair.Value);
                             hashes.AddRange(scriptHashReader.hashes);
+                            progress++;
                         }
                         if (archive.game == Game.TDX)
                         {
@@ -100,13 +157,13 @@ namespace KirbyMINT
                         {
                             Console.Write("\nReading hashes from archive " + files[i]);
                             archive = new Archive(files[i]);
-                            int progress = 0;
+                            int progress = 1;
                             foreach (KeyValuePair<string, byte[]> pair in archive.files)
                             {
-                                progress++;
                                 Console.Write($"\rReading hashes from archive {files[i]} - {progress}/{archive.files.Count} - {(int)(((float)progress / (float)archive.files.Count) * 100)}%");
                                 ScriptHashReader scriptHashReader = new ScriptHashReader(pair.Value);
                                 hashes.AddRange(scriptHashReader.hashes);
+                                progress++;
                             }
                         }
                         if (archive.game == Game.TDX)

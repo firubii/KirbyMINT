@@ -5,9 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using MINT;
-using MINT.TDX;
+using MINT.KSA;
 
-namespace MINT.TDX
+namespace MINT.KSA
 {
     public class Script
     {
@@ -44,6 +44,14 @@ namespace MINT.TDX
             reader.BaseStream.Seek(sdatalist, SeekOrigin.Begin);
             uint sdatalen = reader.ReadUInt32();
             byte[] sdata = reader.ReadBytes((int)sdatalen);
+            string sdataText = $"    SDATA: (0x{sdatalen.ToString("X")}) ";
+            /*sdataText += "{";
+            for (int i = 0; i < sdatalen; i++)
+            {
+                sdataText += $" {sdata[i].ToString("X2")}";
+            }
+            sdataText += " }";*/
+            script.Add(sdataText);
             reader.BaseStream.Seek(xreflist, SeekOrigin.Begin);
             uint xrefcount = reader.ReadUInt32();
             List<string> xref = new List<string>();
@@ -60,6 +68,13 @@ namespace MINT.TDX
                     xref.Add(xrefHash.ToString("X8"));
                 }
             }
+            string xrefListText = $"    XREF: (0x{xrefcount.ToString("X")}) " + "\n    {";
+            for (int i = 0; i < xrefcount; i++)
+            {
+                xrefListText += $"\n        {xref[i]}";
+            }
+            xrefListText += "\n    }";
+            script.Add(xrefListText);
             reader.BaseStream.Seek(classlist, SeekOrigin.Begin);
             uint classcount = reader.ReadUInt32();
             List<uint> classoffsets = new List<uint>();
@@ -149,6 +164,7 @@ namespace MINT.TDX
                         byte z = reader.ReadByte();
                         byte x = reader.ReadByte();
                         byte y = reader.ReadByte();
+                        ushort u = BitConverter.ToUInt16(new byte[] { z, x }, 0);
                         ushort v = BitConverter.ToUInt16(new byte[] { x, y }, 0);
                         if (opcodes.opcodeNames.Keys.Contains(w))
                         {
@@ -218,6 +234,11 @@ namespace MINT.TDX
                                         cmd += $" r{z.ToString("X2")}, \"{strV}\"";
                                         break;
                                     }
+                                case Format.xU:
+                                    {
+                                        cmd += $" {xref[u]}";
+                                        break;
+                                    }
                                 case Format.xV:
                                     {
                                         cmd += $" {xref[v]}";
@@ -280,7 +301,7 @@ namespace MINT.TDX
                         {
                             script.Add("            " + $"{w.ToString("X2")} {z.ToString("X2")} {x.ToString("X2")} {y.ToString("X2")}");
                         }
-                        if (w == 0x47 || w == 0x48)
+                        if (w == 0x48)
                         {
                             break;
                         }
