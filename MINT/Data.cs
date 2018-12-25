@@ -23,8 +23,9 @@ namespace MINT
         strV, //1 argument - read string from sdata at ushort offset byte 3/4
         strZV, //2 arguments - (register) byte 2 & read string from sdata at ushort offset byte 3/4
         xV, //1 argument - read cmd hash/string from xref data, ushort index byte 3/4
-        xU, //1 argument - read cmd hash/string from xref data, ushort index byte 2/3
         xZV, //2 arguments - (register) byte 2 & read cmd hash/string from xref data, ushort index byte 3/4
+        shV, //1 argument - short byte 3/4
+        shZV, //2 arguments - (register) byte 2 & short byte 3/4
         ZX, //2 arguments - (register) byte 2 & byte 3
         aZX, //2 arguments - (arg) byte 2 & (register) byte 3
         aaZX, //2 arguments - (arg) byte 2 & (arg) byte 3

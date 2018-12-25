@@ -70,10 +70,10 @@ namespace KirbyMINT
                                 Console.Write($"\rDecompiling scripts... {progress}/{archive.files.Count} - {(int)(((float)progress / (float)archive.files.Count) * 100)}%");
                                 string name = pair.Key;
                                 byte[] file = pair.Value;
-                                string filedir = dir + "\\" + (name + ".txt").Replace("." + name.Split('.').Last() + ".txt", "").Replace(".", "\\");
+                                string filedir = dir + "\\" + (name + ".mint").Replace("." + name.Split('.').Last() + ".mint", "").Replace(".", "\\");
                                 if (!Directory.Exists(filedir))
                                     Directory.CreateDirectory(filedir);
-                                filedir = dir + "\\" + name.Replace(".", "\\") + ".txt";
+                                filedir = dir + "\\" + name.Replace(".", "\\") + ".mint";
                                 File.WriteAllLines(filedir, script.script);
                                 progress++;
                             }
@@ -83,10 +83,10 @@ namespace KirbyMINT
                                 Console.Write($"\rDecompiling scripts... {progress}/{archive.files.Count} - {(int)(((float)progress / (float)archive.files.Count) * 100)}%");
                                 string name = pair.Key;
                                 byte[] file = pair.Value;
-                                string filedir = dir + "\\" + (name + ".txt").Replace("." + name.Split('.').Last() + ".txt", "").Replace(".", "\\");
+                                string filedir = dir + "\\" + (name + ".mint").Replace("." + name.Split('.').Last() + ".mint", "").Replace(".", "\\");
                                 if (!Directory.Exists(filedir))
                                     Directory.CreateDirectory(filedir);
-                                filedir = dir + "\\" + name.Replace(".", "\\") + ".txt";
+                                filedir = dir + "\\" + name.Replace(".", "\\") + ".mint";
                                 File.WriteAllLines(filedir, script.script);
                                 progress++;
                             }

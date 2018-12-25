@@ -15,13 +15,48 @@ namespace MINT.KSA
             {0x02, "setFalse" },
             {0x03, "load" },
             {0x04, "loadString" },
+            {0x05, "moveRegister" },
 
             {0x08, "getField" },
 
             {0x15, "setField" },
 
+            {0x19, "addi" },
+            {0x1A, "subi" },
+            {0x1B, "multi" },
+            {0x1C, "divi" },
+            {0x1D, "modi" },
+            {0x1E, "inci" },
+            {0x1F, "negi" },
+
+            {0x20, "addf" },
+            {0x21, "subf" },
+            {0x22, "multf" },
+            {0x23, "divf" },
+            {0x24, "modf" },
+            {0x25, "incf" },
+            {0x26, "negf" },
+
+            {0x27, "intLess" },
+            {0x28, "intLessOrEqual" },
+            {0x29, "intEqual" },
+            {0x2A, "intNotEqual" },
+
+            {0x2B, "floatLess" },
+            {0x2C, "floatLessOrEqual" },
+            {0x2D, "floatEqual" },
+            {0x2E, "floatNotEqual" },
+
+            {0x44, "jump" },
+            {0x45, "jumpIfTrue" },
+            {0x46, "jumpIfFalse" },
+
             {0x47, "declare" },
             {0x48, "return" },
+            {0x49, "call" },
+            {0x4A, "call_unknown" },
+            {0x4B, "callSystem" },
+            {0x4C, "callExternal" }
         };
         public Dictionary<byte, Format> opcodeFormats = new Dictionary<byte, Format>()
         {
@@ -29,13 +64,48 @@ namespace MINT.KSA
             {0x02, Format.Z },
             {0x03, Format.sZV },
             {0x04, Format.strZV },
+            {0x05, Format.ZX },
 
             {0x08, Format.xZV },
 
             {0x15, Format.xZV },
 
+            {0x19, Format.ZXY },
+            {0x1A, Format.ZXY },
+            {0x1B, Format.ZXY },
+            {0x1C, Format.ZXY },
+            {0x1D, Format.ZXY },
+            {0x1E, Format.Z },
+            {0x1F, Format.Z },
+
+            {0x20, Format.ZXY },
+            {0x21, Format.ZXY },
+            {0x22, Format.ZXY },
+            {0x23, Format.ZXY },
+            {0x24, Format.ZXY },
+            {0x25, Format.Z },
+            {0x26, Format.Z },
+
+            {0x27, Format.ZXY },
+            {0x28, Format.ZXY },
+            {0x29, Format.ZXY },
+            {0x2A, Format.ZXY },
+
+            {0x2B, Format.ZXY },
+            {0x2C, Format.ZXY },
+            {0x2D, Format.ZXY },
+            {0x2E, Format.ZXY },
+
+            {0x44, Format.shV },
+            {0x45, Format.shZV },
+            {0x46, Format.shZV },
+
             {0x47, Format.nZXY },
-            {0x48, Format.None },
+            {0x48, Format.Y },
+            {0x49, Format.xZV },
+            {0x4A, Format.xZV },
+            {0x4B, Format.xZV },
+            {0x4C, Format.xZV }
         };
     }
 }

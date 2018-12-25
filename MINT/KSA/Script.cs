@@ -164,8 +164,8 @@ namespace MINT.KSA
                         byte z = reader.ReadByte();
                         byte x = reader.ReadByte();
                         byte y = reader.ReadByte();
-                        ushort u = BitConverter.ToUInt16(new byte[] { z, x }, 0);
                         ushort v = BitConverter.ToUInt16(new byte[] { x, y }, 0);
+                        short sv = BitConverter.ToInt16(new byte[] { x, y }, 0);
                         if (opcodes.opcodeNames.Keys.Contains(w))
                         {
                             string cmd = "            " + opcodes.opcodeNames[w];
@@ -234,11 +234,6 @@ namespace MINT.KSA
                                         cmd += $" r{z.ToString("X2")}, \"{strV}\"";
                                         break;
                                     }
-                                case Format.xU:
-                                    {
-                                        cmd += $" {xref[u]}";
-                                        break;
-                                    }
                                 case Format.xV:
                                     {
                                         cmd += $" {xref[v]}";
@@ -247,6 +242,16 @@ namespace MINT.KSA
                                 case Format.xZV:
                                     {
                                         cmd += $" r{z.ToString("X2")}, {xref[v]}";
+                                        break;
+                                    }
+                                case Format.shV:
+                                    {
+                                        cmd += $" {sv}";
+                                        break;
+                                    }
+                                case Format.shZV:
+                                    {
+                                        cmd += $" r{z.ToString("X2")}, {sv}";
                                         break;
                                     }
                                 case Format.ZX:
