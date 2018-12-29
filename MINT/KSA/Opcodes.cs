@@ -19,6 +19,10 @@ namespace MINT.KSA
 
             {0x08, "getField" },
 
+            {0x0D, "xref_unknown_0D" },
+
+            {0x0F, "xref_unknown_0F" },
+
             {0x15, "setField" },
 
             {0x19, "addi" },
@@ -47,6 +51,8 @@ namespace MINT.KSA
             {0x2D, "floatEqual" },
             {0x2E, "floatNotEqual" },
 
+            {0x3E, "addBit" },
+
             {0x44, "jump" },
             {0x45, "jumpIfTrue" },
             {0x46, "jumpIfFalse" },
@@ -54,9 +60,17 @@ namespace MINT.KSA
             {0x47, "declare" },
             {0x48, "return" },
             {0x49, "call" },
-            {0x4A, "call_unknown" },
-            {0x4B, "callSystem" },
-            {0x4C, "callExternal" }
+            {0x4A, "callSystem3" },
+            {0x4B, "callSystem2" },
+            {0x4C, "callSystem" },
+
+            {0x53, "xref_unknown_53" },
+
+            {0x55, "xref_unknown_55" },
+
+            {0x67, "new" },
+
+            {0x6B, "getConstant" }
         };
         public Dictionary<byte, Format> opcodeFormats = new Dictionary<byte, Format>()
         {
@@ -67,6 +81,10 @@ namespace MINT.KSA
             {0x05, Format.ZX },
 
             {0x08, Format.xZV },
+
+            {0x0D, Format.xZV },
+
+            {0x0F, Format.xZV },
 
             {0x15, Format.xZV },
 
@@ -96,6 +114,8 @@ namespace MINT.KSA
             {0x2D, Format.ZXY },
             {0x2E, Format.ZXY },
 
+            {0x3E, Format.ZXY },
+
             {0x44, Format.shV },
             {0x45, Format.shZV },
             {0x46, Format.shZV },
@@ -105,7 +125,15 @@ namespace MINT.KSA
             {0x49, Format.xZV },
             {0x4A, Format.xZV },
             {0x4B, Format.xZV },
-            {0x4C, Format.xZV }
+            {0x4C, Format.xZV },
+
+            {0x53, Format.xZV },
+
+            {0x55, Format.xZV },
+
+            {0x67, Format.xZV },
+
+            {0x6B, Format.xZV }
         };
     }
 }
