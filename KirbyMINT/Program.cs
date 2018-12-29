@@ -67,28 +67,44 @@ namespace KirbyMINT
                             if (archive.game == Game.TDX)
                             {
                                 MINT.TDX.Script script = new MINT.TDX.Script(pair.Value, hashIds.ToArray(), hashNames.ToArray());
-                                Console.Write($"\rDecompiling scripts... {progress}/{archive.files.Count} - {(int)(((float)progress / (float)archive.files.Count) * 100)}%");
-                                string name = pair.Key;
-                                byte[] file = pair.Value;
-                                string filedir = dir + "\\" + (name + ".mint").Replace("." + name.Split('.').Last() + ".mint", "").Replace(".", "\\");
-                                if (!Directory.Exists(filedir))
-                                    Directory.CreateDirectory(filedir);
-                                filedir = dir + "\\" + name.Replace(".", "\\") + ".mint";
-                                File.WriteAllLines(filedir, script.script);
-                                progress++;
+                                if (!script.decompileFailure)
+                                {
+                                    Console.Write($"\rDecompiling scripts... {progress}/{archive.files.Count} - {(int)(((float)progress / (float)archive.files.Count) * 100)}%");
+                                    string name = pair.Key;
+                                    byte[] file = pair.Value;
+                                    string filedir = dir + "\\" + (name + ".mint").Replace("." + name.Split('.').Last() + ".mint", "").Replace(".", "\\");
+                                    if (!Directory.Exists(filedir))
+                                        Directory.CreateDirectory(filedir);
+                                    filedir = dir + "\\" + name.Replace(".", "\\") + ".mint";
+                                    File.WriteAllLines(filedir, script.script);
+                                    progress++;
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Stopping.");
+                                    return;
+                                }
                             }
                             else if (archive.game == Game.KSA)
                             {
                                 MINT.KSA.Script script = new MINT.KSA.Script(pair.Value, hashIds.ToArray(), hashNames.ToArray());
-                                Console.Write($"\rDecompiling scripts... {progress}/{archive.files.Count} - {(int)(((float)progress / (float)archive.files.Count) * 100)}%");
-                                string name = pair.Key;
-                                byte[] file = pair.Value;
-                                string filedir = dir + "\\" + (name + ".mint").Replace("." + name.Split('.').Last() + ".mint", "").Replace(".", "\\");
-                                if (!Directory.Exists(filedir))
-                                    Directory.CreateDirectory(filedir);
-                                filedir = dir + "\\" + name.Replace(".", "\\") + ".mint";
-                                File.WriteAllLines(filedir, script.script);
-                                progress++;
+                                if (!script.decompileFailure)
+                                {
+                                    Console.Write($"\rDecompiling scripts... {progress}/{archive.files.Count} - {(int)(((float)progress / (float)archive.files.Count) * 100)}%");
+                                    string name = pair.Key;
+                                    byte[] file = pair.Value;
+                                    string filedir = dir + "\\" + (name + ".mint").Replace("." + name.Split('.').Last() + ".mint", "").Replace(".", "\\");
+                                    if (!Directory.Exists(filedir))
+                                        Directory.CreateDirectory(filedir);
+                                    filedir = dir + "\\" + name.Replace(".", "\\") + ".mint";
+                                    File.WriteAllLines(filedir, script.script);
+                                    progress++;
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Stopping.");
+                                    return;
+                                }
                             }
                         }
                         Console.WriteLine("\nFinished.");

@@ -11,6 +11,8 @@ namespace MINT.KSA
 {
     public class Script
     {
+        public bool decompileFailure = false;
+
         public List<string> script = new List<string>();
         public List<byte[]> compScript = new List<byte[]>();
 
@@ -152,7 +154,7 @@ namespace MINT.KSA
                     uint methodflags = reader.ReadUInt32();
                     reader.BaseStream.Seek(methodnameoffset, SeekOrigin.Begin);
                     uint methodnamelen = reader.ReadUInt32();
-                    string methodname = string.Join("", reader.ReadChars((int)methodnamelen));
+                    string methodname = Encoding.UTF8.GetString(reader.ReadBytes((int)methodnamelen));
                     script.Add("\n        [" + BitConverter.ToUInt32(methodhash, 0).ToString("X8") + "] (" + methodflags + ")");
                     script.Add("        " + methodname);
                     script.Add("        {");
@@ -168,139 +170,149 @@ namespace MINT.KSA
                         short sv = BitConverter.ToInt16(new byte[] { x, y }, 0);
                         if (opcodes.opcodeNames.Keys.Contains(w))
                         {
-                            string cmd = "            " + opcodes.opcodeNames[w];
-                            switch (opcodes.opcodeFormats[w])
+                            try
                             {
-                                case Format.None:
-                                    {
-                                        break;
-                                    }
-                                case Format.Z:
-                                    {
-                                        cmd += $" r{z.ToString("X2")}";
-                                        break;
-                                    }
-                                case Format.X:
-                                    {
-                                        cmd += $" r{x.ToString("X2")}";
-                                        break;
-                                    }
-                                case Format.Y:
-                                    {
-                                        cmd += $" r{y.ToString("X2")}";
-                                        break;
-                                    }
-                                case Format.sV:
-                                    {
-                                        cmd += $" 0x{BitConverter.ToUInt32(sdata, v).ToString("X")}";
-                                        break;
-                                    }
-                                case Format.sZV:
-                                    {
-                                        cmd += $" r{z.ToString("X2")}, 0x{BitConverter.ToUInt32(sdata, v).ToString("X")}";
-                                        break;
-                                    }
-                                case Format.strV:
-                                    {
-                                        string strV = "";
-                                        for (int s = v; s < sdata.Length; s++)
+                                string cmd = "            " + opcodes.opcodeNames[w];
+                                switch (opcodes.opcodeFormats[w])
+                                {
+                                    case Format.None:
                                         {
-                                            if (sdata[s] != 0x00)
-                                            {
-                                                strV += Encoding.UTF8.GetChars(sdata, s, 1);
-                                            }
-                                            else
-                                            {
-                                                break;
-                                            }
+                                            break;
                                         }
-                                        cmd += $" \"{strV}\"";
-                                        break;
-                                    }
-                                case Format.strZV:
-                                    {
-                                        string strV = "";
-                                        for (int s = v; s < sdata.Length; s++)
+                                    case Format.Z:
                                         {
-                                            if (sdata[s] != 0x00)
-                                            {
-                                                strV += Encoding.UTF8.GetString(sdata, s, 1);
-                                            }
-                                            else
-                                            {
-                                                break;
-                                            }
+                                            cmd += $" r{z.ToString("X2")}";
+                                            break;
                                         }
-                                        cmd += $" r{z.ToString("X2")}, \"{strV}\"";
-                                        break;
-                                    }
-                                case Format.xV:
-                                    {
-                                        cmd += $" {xref[v]}";
-                                        break;
-                                    }
-                                case Format.xZV:
-                                    {
-                                        cmd += $" r{z.ToString("X2")}, {xref[v]}";
-                                        break;
-                                    }
-                                case Format.shV:
-                                    {
-                                        cmd += $" {sv}";
-                                        break;
-                                    }
-                                case Format.shZV:
-                                    {
-                                        cmd += $" r{z.ToString("X2")}, {sv}";
-                                        break;
-                                    }
-                                case Format.ZX:
-                                    {
-                                        cmd += $" r{z.ToString("X2")}, r{x.ToString("X2")}";
-                                        break;
-                                    }
-                                case Format.aZX:
-                                    {
-                                        cmd += $" [{z.ToString("X2")}] r{x.ToString("X2")}";
-                                        break;
-                                    }
-                                case Format.aaZX:
-                                    {
-                                        cmd += $" [{z.ToString("X2")} {x.ToString("X2")}]";
-                                        break;
-                                    }
-                                case Format.ZY:
-                                    {
-                                        cmd += $" r{z.ToString("X2")}, r{y.ToString("X2")}";
-                                        break;
-                                    }
-                                case Format.XY:
-                                    {
-                                        cmd += $" r{x.ToString("X2")}, r{y.ToString("X2")}";
-                                        break;
-                                    }
-                                case Format.ZXY:
-                                    {
-                                        cmd += $" r{z.ToString("X2")}, r{x.ToString("X2")}, r{y.ToString("X2")}";
-                                        break;
-                                    }
-                                case Format.nZXY:
-                                    {
-                                        cmd += $" {z.ToString("X2")}, {x.ToString("X2")}, {y.ToString("X2")}";
-                                        break;
-                                    }
-                                case Format.aZXY:
-                                    {
-                                        cmd += $" [{z.ToString("X2")}] r{x.ToString("X2")}, r{y.ToString("X2")}";
-                                        break;
-                                    }
-                                case Format.ZXxY:
-                                    {
-                                        cmd += $" r{z.ToString("X2")}, r{x.ToString("X2")}, {xref[y]}";
-                                        break;
-                                    }
+                                    case Format.X:
+                                        {
+                                            cmd += $" r{x.ToString("X2")}";
+                                            break;
+                                        }
+                                    case Format.Y:
+                                        {
+                                            cmd += $" r{y.ToString("X2")}";
+                                            break;
+                                        }
+                                    case Format.sV:
+                                        {
+                                            cmd += $" 0x{BitConverter.ToUInt32(sdata, v).ToString("X")}";
+                                            break;
+                                        }
+                                    case Format.sZV:
+                                        {
+                                            cmd += $" r{z.ToString("X2")}, 0x{BitConverter.ToUInt32(sdata, v).ToString("X")}";
+                                            break;
+                                        }
+                                    case Format.strV:
+                                        {
+                                            string strV = "";
+                                            for (int s = v; s < sdata.Length; s++)
+                                            {
+                                                if (sdata[s] != 0x00)
+                                                {
+                                                    strV += Encoding.UTF8.GetChars(sdata, s, 1);
+                                                }
+                                                else
+                                                {
+                                                    break;
+                                                }
+                                            }
+                                            cmd += $" \"{strV}\"";
+                                            break;
+                                        }
+                                    case Format.strZV:
+                                        {
+                                            string strV = "";
+                                            for (int s = v; s < sdata.Length; s++)
+                                            {
+                                                if (sdata[s] != 0x00)
+                                                {
+                                                    strV += Encoding.UTF8.GetString(sdata, s, 1);
+                                                }
+                                                else
+                                                {
+                                                    break;
+                                                }
+                                            }
+                                            cmd += $" r{z.ToString("X2")}, \"{strV}\"";
+                                            break;
+                                        }
+                                    case Format.xV:
+                                        {
+                                            cmd += $" {xref[v]}";
+                                            break;
+                                        }
+                                    case Format.xZV:
+                                        {
+                                            cmd += $" r{z.ToString("X2")}, {xref[v]}";
+                                            break;
+                                        }
+                                    case Format.shV:
+                                        {
+                                            cmd += $" {sv}";
+                                            break;
+                                        }
+                                    case Format.shZV:
+                                        {
+                                            cmd += $" r{z.ToString("X2")}, {sv}";
+                                            break;
+                                        }
+                                    case Format.ZX:
+                                        {
+                                            cmd += $" r{z.ToString("X2")}, r{x.ToString("X2")}";
+                                            break;
+                                        }
+                                    case Format.aZX:
+                                        {
+                                            cmd += $" [{z.ToString("X2")}] r{x.ToString("X2")}";
+                                            break;
+                                        }
+                                    case Format.aaZX:
+                                        {
+                                            cmd += $" [{z.ToString("X2")} {x.ToString("X2")}]";
+                                            break;
+                                        }
+                                    case Format.ZY:
+                                        {
+                                            cmd += $" r{z.ToString("X2")}, r{y.ToString("X2")}";
+                                            break;
+                                        }
+                                    case Format.XY:
+                                        {
+                                            cmd += $" r{x.ToString("X2")}, r{y.ToString("X2")}";
+                                            break;
+                                        }
+                                    case Format.ZXY:
+                                        {
+                                            cmd += $" r{z.ToString("X2")}, r{x.ToString("X2")}, r{y.ToString("X2")}";
+                                            break;
+                                        }
+                                    case Format.nZXY:
+                                        {
+                                            cmd += $" {z.ToString("X2")}, {x.ToString("X2")}, {y.ToString("X2")}";
+                                            break;
+                                        }
+                                    case Format.aZXY:
+                                        {
+                                            cmd += $" [{z.ToString("X2")}] r{x.ToString("X2")}, r{y.ToString("X2")}";
+                                            break;
+                                        }
+                                    case Format.ZXxY:
+                                        {
+                                            cmd += $" r{z.ToString("X2")}, r{x.ToString("X2")}, {xref[y]}";
+                                            break;
+                                        }
+                                }
+                                script.Add(cmd);
                             }
-                            script.Add(cmd);
+                            catch
+                            {
+                                Console.WriteLine($"\n!! ERROR !!\nFailed to analyze command!\nERROR DATA:\nFULL COMMAND: {w.ToString("X2")} {z.ToString("X2")} {x.ToString("X2")} {y.ToString("X2")}\nOFFSET: 0x{(reader.BaseStream.Position - 4).ToString("X8")}\nSCRIPT: {scriptname}\nFUNCTION: {methodname}");
+                                throw new Exception("CommandReadFailure");
+                                decompileFailure = true;
+                                return;
+                            }
                         }
                         else
                         {
