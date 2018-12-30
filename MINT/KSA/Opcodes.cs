@@ -51,7 +51,9 @@ namespace MINT.KSA
             {0x2D, "floatEqual" },
             {0x2E, "floatNotEqual" },
 
-            {0x3E, "addBit" },
+            {0x3E, "bitAnd" },
+            {0x3F, "bitOr" },
+            {0x40, "bitXor" },
 
             {0x44, "jump" },
             {0x45, "jumpIfTrue" },
@@ -115,6 +117,8 @@ namespace MINT.KSA
             {0x2E, Format.ZXY },
 
             {0x3E, Format.ZXY },
+            {0x3F, Format.ZXY },
+            {0x40, Format.ZXY },
 
             {0x44, Format.shV },
             {0x45, Format.shZV },

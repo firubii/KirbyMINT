@@ -32,12 +32,11 @@ namespace KirbyMINT
                         {
                             dir = Directory.GetCurrentDirectory() + "\\MINT";
                         }
-                        if (Directory.Exists(dir))
+                        if (!Directory.Exists(dir))
                         {
-                            Console.WriteLine("Removing existing directory...");
-                            Directory.Delete(dir, true);
+                            Console.WriteLine("Directory does not exist! Creating...");
+                            Directory.CreateDirectory(dir);
                         }
-                        Directory.CreateDirectory(dir);
                         Console.WriteLine("Reading archive...");
                         Archive archive = new Archive(args[index]);
                         List<uint> hashIds = new List<uint>();

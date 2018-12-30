@@ -282,7 +282,7 @@ namespace MINT.TDX
                             }
                             catch
                             {
-                                Console.WriteLine($"\n!! ERROR !!\nFailed to analyze command!\nERROR DATA:\nFULL COMMAND: {w.ToString("X2")} {z.ToString("X2")} {x.ToString("X2")} {y.ToString("X2")}\nOFFSET: 0x{(reader.BaseStream.Position - 4).ToString("X8")}\nSCRIPT: {scriptname}\nFUNCTION: {methodname}");
+                                Console.WriteLine($"\n!! ERROR !!\nFailed to analyze command!\nERROR DATA:\n-ORIGIN-\nSCRIPT: {scriptname}\nFUNCTION: {methodname}\nOFFSET: 0x{(reader.BaseStream.Position - 4).ToString("X8")}\nFULL COMMAND: {w.ToString("X2")} {z.ToString("X2")} {x.ToString("X2")} {y.ToString("X2")}\n-SCRIPT DATA-\nSDATA LENGTH: 0x{sdatalen.ToString("X")}\nXREF COUNT: 0x{xrefcount.ToString("X")}");
                                 throw new Exception("CommandReadFailure");
                                 decompileFailure = true;
                                 return;

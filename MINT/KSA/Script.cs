@@ -47,12 +47,12 @@ namespace MINT.KSA
             uint sdatalen = reader.ReadUInt32();
             byte[] sdata = reader.ReadBytes((int)sdatalen);
             string sdataText = $"    SDATA: (0x{sdatalen.ToString("X")}) ";
-            /*sdataText += "{";
+            sdataText += "{";
             for (int i = 0; i < sdatalen; i++)
             {
                 sdataText += $" {sdata[i].ToString("X2")}";
             }
-            sdataText += " }";*/
+            sdataText += " }";
             script.Add(sdataText);
             reader.BaseStream.Seek(xreflist, SeekOrigin.Begin);
             uint xrefcount = reader.ReadUInt32();
@@ -308,7 +308,7 @@ namespace MINT.KSA
                             }
                             catch
                             {
-                                Console.WriteLine($"\n!! ERROR !!\nFailed to analyze command!\nERROR DATA:\nFULL COMMAND: {w.ToString("X2")} {z.ToString("X2")} {x.ToString("X2")} {y.ToString("X2")}\nOFFSET: 0x{(reader.BaseStream.Position - 4).ToString("X8")}\nSCRIPT: {scriptname}\nFUNCTION: {methodname}");
+                                Console.WriteLine($"\n!! ERROR !!\nFailed to analyze command!\nERROR DATA:\n-ORIGIN-\nSCRIPT: {scriptname}\nFUNCTION: {methodname}\nOFFSET: 0x{(reader.BaseStream.Position - 4).ToString("X8")}\nFULL COMMAND: {w.ToString("X2")} {z.ToString("X2")} {x.ToString("X2")} {y.ToString("X2")}\n-SCRIPT DATA-\nSDATA LENGTH: 0x{sdatalen.ToString("X")}\nXREF COUNT: 0x{xrefcount.ToString("X")}");
                                 throw new Exception("CommandReadFailure");
                                 decompileFailure = true;
                                 return;
