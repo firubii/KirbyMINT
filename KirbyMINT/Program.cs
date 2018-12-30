@@ -22,7 +22,16 @@ namespace KirbyMINT
                     int index = args.ToList().IndexOf("-x") + 1;
                     if (args[index].EndsWith(".bin"))
                     {
-                        string dir = Directory.GetCurrentDirectory() + "\\MINT";
+                        string dir;
+                        if (args.Contains("-o"))
+                        {
+                            int dIndex = args.ToList().IndexOf("-o") + 1;
+                            dir = args[dIndex];
+                        }
+                        else
+                        {
+                            dir = Directory.GetCurrentDirectory() + "\\MINT";
+                        }
                         if (Directory.Exists(dir))
                         {
                             Console.WriteLine("Removing existing directory...");
