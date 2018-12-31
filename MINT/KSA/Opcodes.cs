@@ -67,7 +67,7 @@ namespace MINT.KSA
             {0x4C, "callSystem" },
 
             {0x53, "xref_unknown_53" },
-
+            {0x54, "xref_unknown_54" },
             {0x55, "xref_unknown_55" },
 
             {0x67, "new" },
@@ -132,7 +132,7 @@ namespace MINT.KSA
             {0x4C, Format.xZV },
 
             {0x53, Format.xZV },
-
+            {0x54, Format.xZV },
             {0x55, Format.xZV },
 
             {0x67, Format.xZV },
