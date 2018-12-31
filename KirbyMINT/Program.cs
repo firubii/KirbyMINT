@@ -39,8 +39,7 @@ namespace KirbyMINT
                         }
                         Console.WriteLine("Reading archive...");
                         Archive archive = new Archive(args[index]);
-                        List<uint> hashIds = new List<uint>();
-                        List<string> hashNames = new List<string>();
+                        Dictionary<uint, string> hashList = new Dictionary<uint, string>();
                         Console.Write("Reading hashes...");
                         int progress = 1;
                         if (args.Contains("-h") && File.Exists(args[args.ToList().IndexOf("-h") + 1]))
@@ -49,8 +48,7 @@ namespace KirbyMINT
                             string[] hashes = File.ReadAllLines(args[hindex]);
                             for (int i = 0; i < hashes.Length; i++)
                             {
-                                hashIds.Add(uint.Parse(string.Join("", hashes[i].Take(8)), System.Globalization.NumberStyles.HexNumber));
-                                hashNames.Add(string.Join("", hashes[i].Skip(9)));
+                                hashList.Add(uint.Parse(string.Join("", hashes[i].Take(8)), System.Globalization.NumberStyles.HexNumber), string.Join("", hashes[i].Skip(9)));
                             }
                         }
                         else
@@ -62,8 +60,7 @@ namespace KirbyMINT
                                 string[] hashes = scriptHashReader.hashes.ToArray();
                                 for (int i = 0; i < hashes.Length; i++)
                                 {
-                                    hashIds.Add(uint.Parse(string.Join("", hashes[i].Take(8)), System.Globalization.NumberStyles.HexNumber));
-                                    hashNames.Add(string.Join("", hashes[i].Skip(9)));
+                                    hashList.Add(uint.Parse(string.Join("", hashes[i].Take(8)), System.Globalization.NumberStyles.HexNumber), string.Join("", hashes[i].Skip(9)));
                                 }
                                 progress++;
                             }
@@ -74,7 +71,7 @@ namespace KirbyMINT
                         {
                             if (archive.game == Game.TDX)
                             {
-                                MINT.TDX.Script script = new MINT.TDX.Script(pair.Value, hashIds.ToArray(), hashNames.ToArray());
+                                MINT.TDX.Script script = new MINT.TDX.Script(pair.Value, hashList);
                                 if (!script.decompileFailure)
                                 {
                                     Console.Write($"\rDecompiling scripts... {progress}/{archive.files.Count} - {(int)(((float)progress / (float)archive.files.Count) * 100)}%");
@@ -95,7 +92,7 @@ namespace KirbyMINT
                             }
                             else if (archive.game == Game.KSA)
                             {
-                                MINT.KSA.Script script = new MINT.KSA.Script(pair.Value, hashIds.ToArray(), hashNames.ToArray());
+                                MINT.KSA.Script script = new MINT.KSA.Script(pair.Value, hashList);
                                 if (!script.decompileFailure)
                                 {
                                     Console.Write($"\rDecompiling scripts... {progress}/{archive.files.Count} - {(int)(((float)progress / (float)archive.files.Count) * 100)}%");
@@ -123,13 +120,21 @@ namespace KirbyMINT
                     int index = args.ToList().IndexOf("-bin") + 1;
                     if (args[index].EndsWith(".bin") && File.Exists(args[index]))
                     {
-                        string dir = Directory.GetCurrentDirectory() + "\\BIN";
-                        if (Directory.Exists(dir))
+                        string dir;
+                        if (args.Contains("-o"))
                         {
-                            Console.WriteLine("Removing existing directory...");
-                            Directory.Delete(dir, true);
+                            int dIndex = args.ToList().IndexOf("-o") + 1;
+                            dir = args[dIndex];
                         }
-                        Directory.CreateDirectory(dir);
+                        else
+                        {
+                            dir = Directory.GetCurrentDirectory() + "\\BIN";
+                        }
+                        if (!Directory.Exists(dir))
+                        {
+                            Console.WriteLine("Directory does not exist! Creating...");
+                            Directory.CreateDirectory(dir);
+                        }
                         Archive archive = new Archive(args[index]);
                         Console.Write("Extracting files...");
                         int progress = 1;
@@ -158,18 +163,17 @@ namespace KirbyMINT
                             hashes.AddRange(scriptHashReader.hashes);
                             progress++;
                         }
-                        if (archive.game == Game.TDX)
+                        string output;
+                        if (args.Contains("-o"))
                         {
-                            File.WriteAllLines(Directory.GetCurrentDirectory() + "\\hash_tdx.txt", hashes);
+                            int dIndex = args.ToList().IndexOf("-o") + 1;
+                            output = args[dIndex];
                         }
-                        else if (archive.game == Game.KPR)
+                        else
                         {
-                            File.WriteAllLines(Directory.GetCurrentDirectory() + "\\hash_kpr.txt", hashes);
+                            output = Directory.GetCurrentDirectory() + "\\hash_" + archive.game.ToString().ToLower() + ".txt";
                         }
-                        else if (archive.game == Game.KSA)
-                        {
-                            File.WriteAllLines(Directory.GetCurrentDirectory() + "\\hash_ksa.txt", hashes);
-                        }
+                        File.WriteAllLines(output, hashes);
                         Console.WriteLine("\nFinished.");
                     }
                     else if (Directory.Exists(args[index]))
@@ -190,18 +194,17 @@ namespace KirbyMINT
                                 progress++;
                             }
                         }
-                        if (archive.game == Game.TDX)
+                        string output;
+                        if (args.Contains("-o"))
                         {
-                            File.WriteAllLines(Directory.GetCurrentDirectory() + "\\hash_tdx.txt", hashes);
+                            int dIndex = args.ToList().IndexOf("-o") + 1;
+                            output = args[dIndex];
                         }
-                        else if (archive.game == Game.KPR)
+                        else
                         {
-                            File.WriteAllLines(Directory.GetCurrentDirectory() + "\\hash_kpr.txt", hashes);
+                            output = Directory.GetCurrentDirectory() + "\\hash_" + archive.game.ToString().ToLower() + ".txt";
                         }
-                        else if (archive.game == Game.KSA)
-                        {
-                            File.WriteAllLines(Directory.GetCurrentDirectory() + "\\hash_ksa.txt", hashes);
-                        }
+                        File.WriteAllLines(output, hashes);
                         Console.WriteLine("\nFinished.");
                     }
                 }

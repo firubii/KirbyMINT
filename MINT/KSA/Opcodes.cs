@@ -70,6 +70,8 @@ namespace MINT.KSA
             {0x54, "xref_unknown_54" },
             {0x55, "xref_unknown_55" },
 
+            {0x66, "xref_unknown_66" },
+
             {0x67, "new" },
 
             {0x6B, "getConstant" }
@@ -135,6 +137,7 @@ namespace MINT.KSA
             {0x54, Format.xZV },
             {0x55, Format.xZV },
 
+            {0x66, Format.xZV },
             {0x67, Format.xZV },
 
             {0x6B, Format.xZV }

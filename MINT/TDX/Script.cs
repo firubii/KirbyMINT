@@ -16,11 +16,11 @@ namespace MINT.TDX
         public List<string> script = new List<string>();
         public List<byte[]> compScript = new List<byte[]>();
 
-        public Script(byte[] script, uint[] hashIds, string[] hashNames)
+        public Script(byte[] script, Dictionary<uint, string> hashes)
         {
             using (BinaryReader reader = new BinaryReader(new MemoryStream(script)))
             {
-                Read(reader, hashIds, hashNames);
+                Read(reader, hashes);
             }
         }
         public Script(string[] script)
@@ -31,7 +31,7 @@ namespace MINT.TDX
             }
         }
 
-        public void Read(BinaryReader reader, uint[] hashIds, string[] hashNames)
+        public void Read(BinaryReader reader, Dictionary<uint, string> hashes)
         {
             reader.BaseStream.Seek(0x10, SeekOrigin.Begin);
             uint scriptnameoffset = reader.ReadUInt32();
@@ -53,9 +53,9 @@ namespace MINT.TDX
             {
                 byte[] hash = reader.ReadBytes(0x4);
                 uint xrefHash = uint.Parse(BitConverter.ToUInt32(hash, 0).ToString("X8"), System.Globalization.NumberStyles.HexNumber);
-                if (hashIds.Length > 0 && hashIds.Contains(xrefHash))
+                if (hashes.ContainsKey(xrefHash))
                 {
-                    xref.Add(hashNames[hashIds.ToList().IndexOf(xrefHash)]);
+                    xref.Add(hashes[xrefHash]);
                 }
                 else
                 {
