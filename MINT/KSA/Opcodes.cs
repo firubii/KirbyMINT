@@ -31,7 +31,7 @@ namespace MINT.KSA
             {0x1C, "divi" },
             {0x1D, "modi" },
             {0x1E, "inci" },
-            {0x1F, "negi" },
+            {0x1F, "deci" },
 
             {0x20, "addf" },
             {0x21, "subf" },
@@ -39,7 +39,7 @@ namespace MINT.KSA
             {0x23, "divf" },
             {0x24, "modf" },
             {0x25, "incf" },
-            {0x26, "negf" },
+            {0x26, "decf" },
 
             {0x27, "intLess" },
             {0x28, "intLessOrEqual" },
