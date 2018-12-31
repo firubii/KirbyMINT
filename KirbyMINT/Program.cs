@@ -90,6 +90,27 @@ namespace KirbyMINT
                                     return;
                                 }
                             }
+                            else if (archive.game == Game.KPR)
+                            {
+                                MINT.KPR.Script script = new MINT.KPR.Script(pair.Value, hashList);
+                                if (!script.decompileFailure)
+                                {
+                                    Console.Write($"\rDecompiling scripts... {progress}/{archive.files.Count} - {(int)(((float)progress / (float)archive.files.Count) * 100)}%");
+                                    string name = pair.Key;
+                                    byte[] file = pair.Value;
+                                    string filedir = dir + "\\" + (name + ".mint").Replace("." + name.Split('.').Last() + ".mint", "").Replace(".", "\\");
+                                    if (!Directory.Exists(filedir))
+                                        Directory.CreateDirectory(filedir);
+                                    filedir = dir + "\\" + name.Replace(".", "\\") + ".mint";
+                                    File.WriteAllLines(filedir, script.script);
+                                    progress++;
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Stopping.");
+                                    return;
+                                }
+                            }
                             else if (archive.game == Game.KSA)
                             {
                                 MINT.KSA.Script script = new MINT.KSA.Script(pair.Value, hashList);

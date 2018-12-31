@@ -41,6 +41,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Data.cs" />
+    <Compile Include="KPR\Opcodes.cs" />
+    <Compile Include="KPR\Script.cs" />
     <Compile Include="KSA\Opcodes.cs" />
     <Compile Include="KSA\Script.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -49,8 +51,6 @@
     <Compile Include="TDX\Opcodes.cs" />
     <Compile Include="TDX\Script.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="KPR\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
