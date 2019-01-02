@@ -23,6 +23,8 @@ namespace MINT.KSA
 
             {0x0F, "xref_unknown_0F" },
 
+            {0x13, "op_unknown_13" },
+
             {0x15, "setField" },
 
             {0x19, "addi" },
@@ -70,6 +72,8 @@ namespace MINT.KSA
             {0x54, "xref_unknown_54" },
             {0x55, "xref_unknown_55" },
 
+            {0x59, "array_unknown_59" },
+
             {0x66, "xref_unknown_66" },
 
             {0x67, "new" },
@@ -89,6 +93,8 @@ namespace MINT.KSA
             {0x0D, Format.xZV },
 
             {0x0F, Format.xZV },
+
+            {0x13, Format.ZX },
 
             {0x15, Format.xZV },
 
@@ -136,6 +142,8 @@ namespace MINT.KSA
             {0x53, Format.xZV },
             {0x54, Format.xZV },
             {0x55, Format.xZV },
+
+            {0x59, Format.ZX },
 
             {0x66, Format.xZV },
             {0x67, Format.xZV },

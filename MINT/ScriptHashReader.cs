@@ -80,7 +80,7 @@ namespace MINT
                     reader.BaseStream.Seek(methodnameoffset, SeekOrigin.Begin);
                     uint methodnamelen = reader.ReadUInt32();
                     string methodname = string.Join("", reader.ReadChars((int)methodnamelen));
-                    methodname = methodname.Split(' ').Last();
+                    methodname = methodname.Replace(methodname.Split(' ')[0] + " ", "");
                     /*for (int c = 0; c < methodname.Length; c++)
                     {
                         if (methodname[c] == ' ')
