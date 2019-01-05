@@ -80,15 +80,20 @@ namespace MINT
                     reader.BaseStream.Seek(methodnameoffset, SeekOrigin.Begin);
                     uint methodnamelen = reader.ReadUInt32();
                     string methodname = string.Join("", reader.ReadChars((int)methodnamelen));
-                    methodname = methodname.Replace(methodname.Split(' ')[0] + " ", "");
-                    /*for (int c = 0; c < methodname.Length; c++)
+                    string[] splitname = methodname.Split(' ');
+                    for (int c = 0; c < splitname.Length; c++)
                     {
-                        if (methodname[c] == ' ')
+                        if (splitname[c].Contains('('))
                         {
-                            methodname = methodname.Remove(0, c + 1);
+                            List<string> strs = new List<string>();
+                            for (int s = c; s < splitname.Length; s++)
+                            {
+                                strs.Add(splitname[s]);
+                            }
+                            methodname = string.Join(" ", strs);
                             break;
                         }
-                    }*/
+                    }
                     hashes.Add($"{BitConverter.ToUInt32(methodhash, 0).ToString("X8")} {name}.{methodname}");
                 }
             }

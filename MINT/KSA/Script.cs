@@ -46,14 +46,14 @@ namespace MINT.KSA
             reader.BaseStream.Seek(sdatalist, SeekOrigin.Begin);
             uint sdatalen = reader.ReadUInt32();
             byte[] sdata = reader.ReadBytes((int)sdatalen);
-            string sdataText = $"    SDATA: (0x{sdatalen.ToString("X")}) ";
+            /*string sdataText = $"    SDATA: (0x{sdatalen.ToString("X")}) ";
             sdataText += "{";
             for (int i = 0; i < sdatalen; i++)
             {
                 sdataText += $" {sdata[i].ToString("X2")}";
             }
             sdataText += " }";
-            script.Add(sdataText);
+            script.Add(sdataText);*/
             reader.BaseStream.Seek(xreflist, SeekOrigin.Begin);
             uint xrefcount = reader.ReadUInt32();
             List<string> xref = new List<string>();
@@ -70,13 +70,13 @@ namespace MINT.KSA
                     xref.Add(xrefHash.ToString("X8"));
                 }
             }
-            string xrefListText = $"    XREF: (0x{xrefcount.ToString("X")}) " + "\n    {";
+            /*string xrefListText = $"    XREF: (0x{xrefcount.ToString("X")}) " + "\n    {";
             for (int i = 0; i < xrefcount; i++)
             {
                 xrefListText += $"\n        {xref[i]}";
             }
             xrefListText += "\n    }";
-            script.Add(xrefListText);
+            script.Add(xrefListText);*/
             reader.BaseStream.Seek(classlist, SeekOrigin.Begin);
             uint classcount = reader.ReadUInt32();
             List<uint> classoffsets = new List<uint>();
@@ -248,6 +248,11 @@ namespace MINT.KSA
                                             cmd += $" r{z.ToString("X2")}, {xref[v]}";
                                             break;
                                         }
+                                    case Format.xZX:
+                                        {
+                                            cmd += $" r{z.ToString("X2")}, {xref[x]}";
+                                            break;
+                                        }
                                     case Format.shV:
                                         {
                                             cmd += $" {sv}";
@@ -301,6 +306,27 @@ namespace MINT.KSA
                                     case Format.ZXxY:
                                         {
                                             cmd += $" r{z.ToString("X2")}, r{x.ToString("X2")}, {xref[y]}";
+                                            break;
+                                        }
+                                    case Format.LDP:
+                                        {
+                                            cmd += $" r{z.ToString("X2")}, ";
+                                            if (x >= 0x80)
+                                            {
+                                                cmd += $"0x{sdata[x - 128].ToString("X")}, ";
+                                            }
+                                            else
+                                            {
+                                                cmd += $"r{x.ToString("X2")}, ";
+                                            }
+                                            if (y >= 0x80)
+                                            {
+                                                cmd += $"0x{sdata[y - 128].ToString("X")}";
+                                            }
+                                            else
+                                            {
+                                                cmd += $"r{y.ToString("X2")}";
+                                            }
                                             break;
                                         }
                                 }

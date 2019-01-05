@@ -24,6 +24,7 @@ namespace MINT
         strZV, //2 arguments - (register) byte 2 & read string from sdata at ushort offset byte 3/4
         xV, //1 argument - read cmd hash/string from xref data, ushort index byte 3/4
         xZV, //2 arguments - (register) byte 2 & read cmd hash/string from xref data, ushort index byte 3/4
+        xZX, //2 arguments - (register) byte 2 & read cmd hash/string from xref data, index byte 3
         shV, //1 argument - short byte 3/4
         shZV, //2 arguments - (register) byte 2 & short byte 3/4
         ZX, //2 arguments - (register) byte 2 & byte 3
@@ -34,6 +35,7 @@ namespace MINT
         aZXY, //3 arguments - (arg) byte 2 & (register) byte 3 & byte 4
         nZXY, //3 arguments - declare statement parameters
         ZXY, //3 arguments - (register) byte 2 & byte 3 & byte 4
-        XY //2 arguments - (register) byte 3 & byte 4
+        XY, //2 arguments - (register) byte 3 & byte 4
+        LDP //Loads a pair (wx, wy) into rz. If x or y is above 0x80, the 32 bit data is taken from SDATA_START + x or y * 4 - 512 instead
     }
 }
