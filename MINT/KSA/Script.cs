@@ -313,7 +313,7 @@ namespace MINT.KSA
                                             cmd += $" r{z.ToString("X2")}, ";
                                             if (x >= 0x80)
                                             {
-                                                cmd += $"0x{sdata[x - 128].ToString("X")}, ";
+                                                cmd += $"0x{BitConverter.ToUInt32(sdata, x - 128).ToString("X")}, ";
                                             }
                                             else
                                             {
@@ -321,7 +321,7 @@ namespace MINT.KSA
                                             }
                                             if (y >= 0x80)
                                             {
-                                                cmd += $"0x{sdata[y - 128].ToString("X")}";
+                                                cmd += $"0x{BitConverter.ToUInt32(sdata, y - 128).ToString("X")}";
                                             }
                                             else
                                             {
