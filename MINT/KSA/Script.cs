@@ -96,7 +96,7 @@ namespace MINT.KSA
                 reader.BaseStream.Seek(nameoffset, SeekOrigin.Begin);
                 uint namelen = reader.ReadUInt32();
                 string name = string.Join("", reader.ReadChars((int)namelen));
-                script.Add("\n    (" + flags + ") class " + name);
+                script.Add("\n    [" + flags + "] class " + name);
                 script.Add("    {");
                 reader.BaseStream.Seek(varlist, SeekOrigin.Begin);
                 uint varcount = reader.ReadUInt32();
