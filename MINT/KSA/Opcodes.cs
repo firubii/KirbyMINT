@@ -88,17 +88,7 @@ namespace MINT.KSA
             {0x4B, "callExternal2" },
             {0x4C, "callExternal3" },
 
-            {0x53, "xref_unknown_53" },
-            {0x54, "xref_unknown_54" },
-            {0x55, "xref_unknown_55" },
-
-            {0x59, "array_unknown_59" },
-
-            {0x66, "xref_unknown_66" },
-
-            {0x67, "new" },
-
-            {0x6B, "getConstant" }
+            {0x4F, "yield" },
         };
         public Dictionary<byte, Format> opcodeFormats = new Dictionary<byte, Format>()
         {
@@ -179,16 +169,7 @@ namespace MINT.KSA
             {0x4B, Format.xZV },
             {0x4C, Format.xZV },
 
-            {0x53, Format.xZV },
-            {0x54, Format.xZV },
-            {0x55, Format.xZV },
-
-            {0x59, Format.ZX },
-
-            {0x66, Format.xZV },
-            {0x67, Format.xZV },
-
-            {0x6B, Format.xZV }
+            {0x4F, Format.Z },
         };
     }
 }
