@@ -96,8 +96,7 @@ namespace MINT.KSA
                 reader.BaseStream.Seek(nameoffset, SeekOrigin.Begin);
                 uint namelen = reader.ReadUInt32();
                 string name = string.Join("", reader.ReadChars((int)namelen));
-                script.Add("\n    [" + BitConverter.ToUInt32(hash, 0).ToString("X8") + "] (" + flags + ")");
-                script.Add("    class " + name);
+                script.Add("\n    (" + flags + ") class " + name);
                 script.Add("    {");
                 reader.BaseStream.Seek(varlist, SeekOrigin.Begin);
                 uint varcount = reader.ReadUInt32();
@@ -119,7 +118,7 @@ namespace MINT.KSA
                     reader.BaseStream.Seek(vartypeoffset, SeekOrigin.Begin);
                     uint vartypelen = reader.ReadUInt32();
                     string vartype = string.Join("", reader.ReadChars((int)vartypelen));
-                    script.Add("        [#" + BitConverter.ToUInt32(varhash, 0).ToString("X8") + "] (" + varflags + ") " + vartype + " " + varname);
+                    script.Add("        [" + varflags + "] " + vartype + " " + varname);
                 }
                 reader.BaseStream.Seek(constlist, SeekOrigin.Begin);
                 uint constcount = reader.ReadUInt32();
@@ -155,8 +154,7 @@ namespace MINT.KSA
                     reader.BaseStream.Seek(methodnameoffset, SeekOrigin.Begin);
                     uint methodnamelen = reader.ReadUInt32();
                     string methodname = Encoding.UTF8.GetString(reader.ReadBytes((int)methodnamelen));
-                    script.Add("\n        [" + BitConverter.ToUInt32(methodhash, 0).ToString("X8") + "] (" + methodflags + ")");
-                    script.Add("        " + methodname);
+                    script.Add("\n        [" + methodflags + "] " + methodname);
                     script.Add("        {");
                     reader.BaseStream.Seek(methoddataoffset, SeekOrigin.Begin);
                     Opcodes opcodes = new Opcodes();
