@@ -27,9 +27,6 @@ namespace MINT
             uint scriptnameoffset = reader.ReadUInt32();
             reader.BaseStream.Seek(0x1C, SeekOrigin.Begin);
             uint classlist = reader.ReadUInt32();
-            reader.BaseStream.Seek(scriptnameoffset, SeekOrigin.Begin);
-            uint scriptnamelen = reader.ReadUInt32();
-            string scriptname = string.Join("", reader.ReadChars((int)scriptnamelen));
             reader.BaseStream.Seek(classlist, SeekOrigin.Begin);
             uint classcount = reader.ReadUInt32();
             List<uint> classoffsets = new List<uint>();
@@ -45,8 +42,7 @@ namespace MINT
                 uint varlist = reader.ReadUInt32();
                 uint methodlist = reader.ReadUInt32();
                 reader.BaseStream.Seek(nameoffset, SeekOrigin.Begin);
-                uint namelen = reader.ReadUInt32();
-                string name = string.Join("", reader.ReadChars((int)namelen));
+                string name = Encoding.UTF8.GetString(reader.ReadBytes(reader.ReadInt32()));
                 hashes.Add($"{BitConverter.ToUInt32(hash, 0).ToString("X8")} {name}");
                 reader.BaseStream.Seek(varlist, SeekOrigin.Begin);
                 uint varcount = reader.ReadUInt32();
@@ -61,8 +57,7 @@ namespace MINT
                     uint varnameoffset = reader.ReadUInt32();
                     byte[] varhash = reader.ReadBytes(0x4);
                     reader.BaseStream.Seek(varnameoffset, SeekOrigin.Begin);
-                    uint varnamelen = reader.ReadUInt32();
-                    string varname = string.Join("", reader.ReadChars((int)varnamelen));
+                    string varname = Encoding.UTF8.GetString(reader.ReadBytes(reader.ReadInt32()));
                     hashes.Add($"{BitConverter.ToUInt32(varhash, 0).ToString("X8")} {name}.{varname}");
                 }
                 reader.BaseStream.Seek(methodlist, SeekOrigin.Begin);
@@ -78,8 +73,7 @@ namespace MINT
                     uint methodnameoffset = reader.ReadUInt32();
                     byte[] methodhash = reader.ReadBytes(0x4);
                     reader.BaseStream.Seek(methodnameoffset, SeekOrigin.Begin);
-                    uint methodnamelen = reader.ReadUInt32();
-                    string methodname = string.Join("", reader.ReadChars((int)methodnamelen));
+                    string methodname = Encoding.UTF8.GetString(reader.ReadBytes(reader.ReadInt32()));
                     string[] splitname = methodname.Split(' ');
                     for (int c = 0; c < splitname.Length; c++)
                     {

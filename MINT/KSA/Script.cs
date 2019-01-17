@@ -39,8 +39,7 @@ namespace MINT.KSA
             uint xreflist = reader.ReadUInt32();
             uint classlist = reader.ReadUInt32();
             reader.BaseStream.Seek(scriptnameoffset, SeekOrigin.Begin);
-            uint scriptnamelen = reader.ReadUInt32();
-            string scriptname = string.Join("", reader.ReadChars((int)scriptnamelen));
+            string scriptname = Encoding.UTF8.GetString(reader.ReadBytes(reader.ReadInt32()));
             script.Add("script " + scriptname);
             script.Add("{");
             reader.BaseStream.Seek(sdatalist, SeekOrigin.Begin);
@@ -94,8 +93,7 @@ namespace MINT.KSA
                 uint constlist = reader.ReadUInt32();
                 uint flags = reader.ReadUInt32();
                 reader.BaseStream.Seek(nameoffset, SeekOrigin.Begin);
-                uint namelen = reader.ReadUInt32();
-                string name = string.Join("", reader.ReadChars((int)namelen));
+                string name = Encoding.UTF8.GetString(reader.ReadBytes(reader.ReadInt32()));
                 script.Add("\n    [" + flags + "] class " + name);
                 script.Add("    {");
                 reader.BaseStream.Seek(varlist, SeekOrigin.Begin);
@@ -113,11 +111,9 @@ namespace MINT.KSA
                     uint vartypeoffset = reader.ReadUInt32();
                     uint varflags = reader.ReadUInt32();
                     reader.BaseStream.Seek(varnameoffset, SeekOrigin.Begin);
-                    uint varnamelen = reader.ReadUInt32();
-                    string varname = string.Join("", reader.ReadChars((int)varnamelen));
+                    string varname = Encoding.UTF8.GetString(reader.ReadBytes(reader.ReadInt32()));
                     reader.BaseStream.Seek(vartypeoffset, SeekOrigin.Begin);
-                    uint vartypelen = reader.ReadUInt32();
-                    string vartype = string.Join("", reader.ReadChars((int)vartypelen));
+                    string vartype = Encoding.UTF8.GetString(reader.ReadBytes(reader.ReadInt32()));
                     script.Add("        [" + varflags + "] " + vartype + " " + varname);
                 }
                 reader.BaseStream.Seek(constlist, SeekOrigin.Begin);
@@ -133,8 +129,7 @@ namespace MINT.KSA
                     uint constnameoffset = reader.ReadUInt32();
                     uint constval = reader.ReadUInt32();
                     reader.BaseStream.Seek(constnameoffset, SeekOrigin.Begin);
-                    uint constnamelen = reader.ReadUInt32();
-                    string constname = string.Join("", reader.ReadChars((int)constnamelen));
+                    string constname = Encoding.UTF8.GetString(reader.ReadBytes(reader.ReadInt32()));
                     script.Add("        const " + constname + " = " + constval);
                 }
                 reader.BaseStream.Seek(methodlist, SeekOrigin.Begin);
@@ -152,8 +147,7 @@ namespace MINT.KSA
                     uint methoddataoffset = reader.ReadUInt32();
                     uint methodflags = reader.ReadUInt32();
                     reader.BaseStream.Seek(methodnameoffset, SeekOrigin.Begin);
-                    uint methodnamelen = reader.ReadUInt32();
-                    string methodname = Encoding.UTF8.GetString(reader.ReadBytes((int)methodnamelen));
+                    string methodname = Encoding.UTF8.GetString(reader.ReadBytes(reader.ReadInt32()));
                     script.Add("\n        [" + methodflags + "] " + methodname);
                     script.Add("        {");
                     reader.BaseStream.Seek(methoddataoffset, SeekOrigin.Begin);

@@ -47,8 +47,7 @@ namespace MINT
                 uint nameoffset = reader.ReadUInt32();
                 uint fileoffset = reader.ReadUInt32();
                 reader.BaseStream.Seek(nameoffset, SeekOrigin.Begin);
-                uint stringlen = reader.ReadUInt32();
-                string name = string.Join("", reader.ReadChars((int)stringlen));
+                string name = Encoding.UTF8.GetString(reader.ReadBytes(reader.ReadInt32()));
                 reader.BaseStream.Seek(fileoffset + 0x8, SeekOrigin.Begin);
                 uint filelen = reader.ReadUInt32();
                 reader.BaseStream.Seek(-0xC, SeekOrigin.Current);
