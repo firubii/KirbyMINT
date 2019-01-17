@@ -37,6 +37,7 @@ namespace KirbyMINT
                             Console.WriteLine("Directory does not exist! Creating...");
                             Directory.CreateDirectory(dir);
                         }
+                        System.Diagnostics.Stopwatch w = System.Diagnostics.Stopwatch.StartNew();
                         Console.WriteLine("Reading archive...");
                         Archive archive = new Archive(args[index]);
                         Dictionary<uint, string> hashList = new Dictionary<uint, string>();
@@ -133,7 +134,8 @@ namespace KirbyMINT
                                 }
                             }
                         }
-                        Console.WriteLine("\nFinished.");
+                        w.Stop();
+                        Console.WriteLine($"\nFinished. Operation completed in {(w.Elapsed.Minutes * 60) + w.Elapsed.Seconds}.{w.Elapsed.Milliseconds}s.");
                     }
                 }
                 else if (args.Contains("-bin"))
@@ -156,6 +158,7 @@ namespace KirbyMINT
                             Console.WriteLine("Directory does not exist! Creating...");
                             Directory.CreateDirectory(dir);
                         }
+                        System.Diagnostics.Stopwatch w = System.Diagnostics.Stopwatch.StartNew();
                         Archive archive = new Archive(args[index]);
                         Console.Write("Extracting files...");
                         int progress = 1;
@@ -165,7 +168,8 @@ namespace KirbyMINT
                             File.WriteAllBytes(dir + "\\" + pair.Key + ".bin", pair.Value);
                             progress++;
                         }
-                        Console.WriteLine("\nFinished.");
+                        w.Stop();
+                        Console.WriteLine($"\nFinished. Operation completed in {(w.Elapsed.Minutes * 60) + w.Elapsed.Seconds}.{w.Elapsed.Milliseconds}s.");
                     }
                 }
                 else if (args.Contains("-hash"))
@@ -175,6 +179,7 @@ namespace KirbyMINT
                     {
                         Archive archive = new Archive(args[index]);
                         List<string> hashes = new List<string>();
+                        System.Diagnostics.Stopwatch w = System.Diagnostics.Stopwatch.StartNew();
                         Console.Write("Reading hashes...");
                         int progress = 1;
                         foreach (KeyValuePair<string, byte[]> pair in archive.files)
@@ -195,13 +200,15 @@ namespace KirbyMINT
                             output = Directory.GetCurrentDirectory() + "\\hash_" + archive.game.ToString().ToLower() + ".txt";
                         }
                         File.WriteAllLines(output, hashes);
-                        Console.WriteLine("\nFinished.");
+                        w.Stop();
+                        Console.WriteLine($"\nFinished. Operation completed in {(w.Elapsed.Minutes * 60) + w.Elapsed.Seconds}.{w.Elapsed.Milliseconds}s.");
                     }
                     else if (Directory.Exists(args[index]))
                     {
                         Archive archive = new Archive();
                         List<string> hashes = new List<string>();
                         string[] files = Directory.GetFiles(args[index], "*.bin");
+                        System.Diagnostics.Stopwatch w = System.Diagnostics.Stopwatch.StartNew();
                         for (int i = 0; i < files.Length; i++)
                         {
                             Console.Write("\nReading hashes from archive " + files[i]);
@@ -226,7 +233,8 @@ namespace KirbyMINT
                             output = Directory.GetCurrentDirectory() + "\\hash_" + archive.game.ToString().ToLower() + ".txt";
                         }
                         File.WriteAllLines(output, hashes);
-                        Console.WriteLine("\nFinished.");
+                        w.Stop();
+                        Console.WriteLine($"\nFinished. Operation completed in {(w.Elapsed.Minutes * 60) + w.Elapsed.Seconds}.{w.Elapsed.Milliseconds}s.");
                     }
                 }
             }
