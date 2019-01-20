@@ -79,8 +79,8 @@ namespace MINT.KPR
                 uint flags = reader.ReadUInt32();
                 reader.BaseStream.Seek(nameoffset, SeekOrigin.Begin);
                 string name = Encoding.UTF8.GetString(reader.ReadBytes(reader.ReadInt32()));
-                script.Add("\n    [" + flags + "] class " + name);
-                script.Add("    {");
+                script.Add("\n\t[" + flags + "] class " + name);
+                script.Add("\t{");
                 reader.BaseStream.Seek(varlist, SeekOrigin.Begin);
                 uint varcount = reader.ReadUInt32();
                 List<uint> varoffsets = new List<uint>();
@@ -99,7 +99,7 @@ namespace MINT.KPR
                     string varname = Encoding.UTF8.GetString(reader.ReadBytes(reader.ReadInt32()));
                     reader.BaseStream.Seek(vartypeoffset, SeekOrigin.Begin);
                     string vartype = Encoding.UTF8.GetString(reader.ReadBytes(reader.ReadInt32()));
-                    script.Add("        [" + varflags + "] " + vartype + " " + varname);
+                    script.Add("\t\t[" + varflags + "] " + vartype + " " + varname);
                 }
                 reader.BaseStream.Seek(constlist, SeekOrigin.Begin);
                 uint constcount = reader.ReadUInt32();
@@ -115,7 +115,7 @@ namespace MINT.KPR
                     uint constval = reader.ReadUInt32();
                     reader.BaseStream.Seek(constnameoffset, SeekOrigin.Begin);
                     string constname = Encoding.UTF8.GetString(reader.ReadBytes(reader.ReadInt32()));
-                    script.Add("        const " + constname + " = " + constval);
+                    script.Add("\t\tconst " + constname + " = " + constval);
                 }
                 reader.BaseStream.Seek(methodlist, SeekOrigin.Begin);
                 uint methodcount = reader.ReadUInt32();
@@ -133,8 +133,8 @@ namespace MINT.KPR
                     uint methodflags = reader.ReadUInt32();
                     reader.BaseStream.Seek(methodnameoffset, SeekOrigin.Begin);
                     string methodname = Encoding.UTF8.GetString(reader.ReadBytes(reader.ReadInt32()));
-                    script.Add("\n        [" + methodflags + "] " + methodname);
-                    script.Add("        {");
+                    script.Add("\n\t\t[" + methodflags + "] " + methodname);
+                    script.Add("\t\t{");
                     reader.BaseStream.Seek(methoddataoffset, SeekOrigin.Begin);
                     Opcodes opcodes = new Opcodes();
                     for (int b = 0; b < reader.BaseStream.Length; b++)
@@ -148,7 +148,7 @@ namespace MINT.KPR
                         {
                             try
                             {
-                                string cmd = "            " + opcodes.opcodeNames[w];
+                                string cmd = "\t\t\t" + opcodes.opcodeNames[w];
                                 switch (opcodes.opcodeFormats[w])
                                 {
                                     case Format.None:
@@ -282,16 +282,16 @@ namespace MINT.KPR
                         }
                         else
                         {
-                            script.Add("            " + $"{w.ToString("X2")} {z.ToString("X2")} {x.ToString("X2")} {y.ToString("X2")}");
+                            script.Add("\t\t\t" + $"{w.ToString("X2")} {z.ToString("X2")} {x.ToString("X2")} {y.ToString("X2")}");
                         }
                         if (w == 0x43 || w == 0x44)
                         {
                             break;
                         }
                     }
-                    script.Add("        }");
+                    script.Add("\t\t}");
                 }
-                script.Add("    }");
+                script.Add("\t}");
             }
             script.Add("}");
         }

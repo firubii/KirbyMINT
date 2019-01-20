@@ -97,8 +97,8 @@ namespace MINT.KSA
 
                 string classflagText = "";
 
-                script.Add($"\n    [{flags}] {classflagText}class {name}");
-                script.Add("    {");
+                script.Add($"\n\t[{flags}] {classflagText}class {name}");
+                script.Add("\t{");
                 reader.BaseStream.Seek(varlist, SeekOrigin.Begin);
                 uint varcount = reader.ReadUInt32();
                 List<uint> varoffsets = new List<uint>();
@@ -127,7 +127,7 @@ namespace MINT.KSA
                         }
                     }
 
-                    script.Add($"        [{varflags}] {varflagText}{vartype} {varname}");
+                    script.Add($"\t\t[{varflags}] {varflagText}{vartype} {varname}");
                 }
                 reader.BaseStream.Seek(constlist, SeekOrigin.Begin);
                 uint constcount = reader.ReadUInt32();
@@ -143,7 +143,7 @@ namespace MINT.KSA
                     uint constval = reader.ReadUInt32();
                     reader.BaseStream.Seek(constnameoffset, SeekOrigin.Begin);
                     string constname = Encoding.UTF8.GetString(reader.ReadBytes(reader.ReadInt32()));
-                    script.Add($"        const {constname} = {constval}");
+                    script.Add($"\t\tconst {constname} = {constval}");
                 }
                 reader.BaseStream.Seek(methodlist, SeekOrigin.Begin);
                 uint methodcount = reader.ReadUInt32();
@@ -179,8 +179,8 @@ namespace MINT.KSA
                         }
                     }
 
-                    script.Add($"\n        [{methodflags}] {methodflagText}{methodname}");
-                    script.Add("        {");
+                    script.Add($"\n\t\t[{methodflags}] {methodflagText}{methodname}");
+                    script.Add("\t\t{");
                     reader.BaseStream.Seek(methoddataoffset, SeekOrigin.Begin);
                     Opcodes opcodes = new Opcodes();
                     for (int b = 0; b < reader.BaseStream.Length; b++)
@@ -195,7 +195,7 @@ namespace MINT.KSA
                         {
                             try
                             {
-                                string cmd = "            " + opcodes.opcodeNames[w];
+                                string cmd = "\t\t\t" + opcodes.opcodeNames[w];
                                 switch (opcodes.opcodeFormats[w])
                                 {
                                     case Format.None:
@@ -365,16 +365,16 @@ namespace MINT.KSA
                         }
                         else
                         {
-                            script.Add("            " + $"{w.ToString("X2")} {z.ToString("X2")} {x.ToString("X2")} {y.ToString("X2")}");
+                            script.Add("\t\t\t" + $"{w.ToString("X2")} {z.ToString("X2")} {x.ToString("X2")} {y.ToString("X2")}");
                         }
                         if (w == 0x48)
                         {
                             break;
                         }
                     }
-                    script.Add("        }");
+                    script.Add("\t\t}");
                 }
-                script.Add("    }");
+                script.Add("\t}");
             }
             script.Add("}");
         }
