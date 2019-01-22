@@ -352,6 +352,51 @@ namespace MINT.KSA
                                             }
                                             break;
                                         }
+                                    case Format.LDPstr:
+                                        {
+                                            cmd += $" r{z.ToString("X2")}, ";
+                                            if (x >= 0x80)
+                                            {
+                                                string strV = "";
+                                                for (int s = x - 128; s < sdata.Length; s++)
+                                                {
+                                                    if (sdata[s] != 0x00)
+                                                    {
+                                                        strV += Encoding.UTF8.GetString(sdata, s, 1);
+                                                    }
+                                                    else
+                                                    {
+                                                        break;
+                                                    }
+                                                }
+                                                cmd += $"\"{strV}\", ";
+                                            }
+                                            else
+                                            {
+                                                cmd += $"r{x.ToString("X2")}, ";
+                                            }
+                                            if (y >= 0x80)
+                                            {
+                                                string strV = "";
+                                                for (int s = y - 128; s < sdata.Length; s++)
+                                                {
+                                                    if (sdata[s] != 0x00)
+                                                    {
+                                                        strV += Encoding.UTF8.GetString(sdata, s, 1);
+                                                    }
+                                                    else
+                                                    {
+                                                        break;
+                                                    }
+                                                }
+                                                cmd += $"\"{strV}\"";
+                                            }
+                                            else
+                                            {
+                                                cmd += $"r{y.ToString("X2")}";
+                                            }
+                                            break;
+                                        }
                                 }
                                 script.Add(cmd);
                             }
