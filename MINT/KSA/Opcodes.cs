@@ -189,7 +189,7 @@ namespace MINT.KSA
             {0x45, Format.shZV },
             {0x46, Format.shZV },
             {0x47, Format.nZXY },
-            {0x48, Format.Y },
+            {0x48, Format.Ret },
             {0x49, Format.xZV },
             {0x4A, Format.xZV },
             {0x4B, Format.xZV },

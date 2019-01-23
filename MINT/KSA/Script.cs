@@ -165,10 +165,6 @@ namespace MINT.KSA
                     string methodflagText = "";
                     if (methodflags != 0)
                     {
-                        if ((methodflags & (1 << 7)) != 0)
-                        {
-                            methodflagText += "return ";
-                        }
                         if ((methodflags & (1 << 2)) != 0)
                         {
                             methodflagText += "loop ";
@@ -394,6 +390,14 @@ namespace MINT.KSA
                                             else
                                             {
                                                 cmd += $"r{y.ToString("X2")}";
+                                            }
+                                            break;
+                                        }
+                                    case Format.Ret:
+                                        {
+                                            if ((methodflags & (1 << 7)) != 0)
+                                            {
+                                                cmd += $" r{y.ToString("X2")}";
                                             }
                                             break;
                                         }
