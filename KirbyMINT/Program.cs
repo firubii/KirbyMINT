@@ -58,10 +58,12 @@ namespace KirbyMINT
                             {
                                 Console.Write($"\rReading hashes... {progress}/{archive.files.Count} - {(int)(((float)progress / (float)archive.files.Count) * 100)}%");
                                 ScriptHashReader scriptHashReader = new ScriptHashReader(archive.files[pair.Key]);
-                                string[] hashes = scriptHashReader.hashes.ToArray();
-                                for (int i = 0; i < hashes.Length; i++)
+                                foreach (KeyValuePair<uint, string> p in scriptHashReader.hashes)
                                 {
-                                    hashList.Add(uint.Parse(string.Join("", hashes[i].Take(8)), System.Globalization.NumberStyles.HexNumber), string.Join("", hashes[i].Skip(9)));
+                                    if (!hashList.ContainsKey(p.Key))
+                                    {
+                                        hashList.Add(p.Key, p.Value);
+                                    }
                                 }
                                 progress++;
                             }
@@ -178,7 +180,7 @@ namespace KirbyMINT
                     if (args[index].EndsWith(".bin") && File.Exists(args[index]))
                     {
                         Archive archive = new Archive(args[index]);
-                        List<string> hashes = new List<string>();
+                        Dictionary<uint, string> hashes = new Dictionary<uint, string>();
                         System.Diagnostics.Stopwatch w = System.Diagnostics.Stopwatch.StartNew();
                         Console.Write("Reading hashes...");
                         int progress = 1;
@@ -186,7 +188,13 @@ namespace KirbyMINT
                         {
                             Console.Write($"\rReading hashes... {progress}/{archive.files.Count} - {(int)(((float)progress / (float)archive.files.Count) * 100)}%");
                             ScriptHashReader scriptHashReader = new ScriptHashReader(pair.Value);
-                            hashes.AddRange(scriptHashReader.hashes);
+                            foreach (KeyValuePair<uint, string> p in scriptHashReader.hashes)
+                            {
+                                if (!hashes.ContainsKey(p.Key))
+                                {
+                                    hashes.Add(p.Key, p.Value);
+                                }
+                            }
                             progress++;
                         }
                         string output;
@@ -199,14 +207,19 @@ namespace KirbyMINT
                         {
                             output = Directory.GetCurrentDirectory() + "\\hash_" + archive.game.ToString().ToLower() + ".txt";
                         }
-                        File.WriteAllLines(output, hashes);
+                        List<string> hashTxt = new List<string>();
+                        foreach (KeyValuePair<uint, string> p in hashes)
+                        {
+                            hashTxt.Add($"{p.Key.ToString("X8")} {p.Value}");
+                        }
+                        File.WriteAllLines(output, hashTxt);
                         w.Stop();
                         Console.WriteLine($"\nFinished. Operation completed in {(w.Elapsed.Minutes * 60) + w.Elapsed.Seconds}.{w.Elapsed.Milliseconds}s.");
                     }
                     else if (Directory.Exists(args[index]))
                     {
                         Archive archive = new Archive();
-                        List<string> hashes = new List<string>();
+                        Dictionary<uint, string> hashes = new Dictionary<uint, string>();
                         string[] files = Directory.GetFiles(args[index], "*.bin");
                         System.Diagnostics.Stopwatch w = System.Diagnostics.Stopwatch.StartNew();
                         for (int i = 0; i < files.Length; i++)
@@ -218,7 +231,13 @@ namespace KirbyMINT
                             {
                                 Console.Write($"\rReading hashes from archive {files[i]} - {progress}/{archive.files.Count} - {(int)(((float)progress / (float)archive.files.Count) * 100)}%");
                                 ScriptHashReader scriptHashReader = new ScriptHashReader(pair.Value);
-                                hashes.AddRange(scriptHashReader.hashes);
+                                foreach (KeyValuePair<uint, string> p in scriptHashReader.hashes)
+                                {
+                                    if (!hashes.ContainsKey(p.Key))
+                                    {
+                                        hashes.Add(p.Key, p.Value);
+                                    }
+                                }
                                 progress++;
                             }
                         }
@@ -232,7 +251,12 @@ namespace KirbyMINT
                         {
                             output = Directory.GetCurrentDirectory() + "\\hash_" + archive.game.ToString().ToLower() + ".txt";
                         }
-                        File.WriteAllLines(output, hashes);
+                        List<string> hashTxt = new List<string>();
+                        foreach (KeyValuePair<uint, string> p in hashes)
+                        {
+                            hashTxt.Add($"{p.Key.ToString("X8")} {p.Value}");
+                        }
+                        File.WriteAllLines(output, hashTxt);
                         w.Stop();
                         Console.WriteLine($"\nFinished. Operation completed in {(w.Elapsed.Minutes * 60) + w.Elapsed.Seconds}.{w.Elapsed.Milliseconds}s.");
                     }

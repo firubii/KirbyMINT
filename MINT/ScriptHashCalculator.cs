@@ -15,8 +15,7 @@ namespace MINT
         public ScriptHashCalculator(string name)
         {
             Crc32CAlgorithm crc = new Crc32CAlgorithm();
-            crc.ComputeHash(Encoding.UTF8.GetBytes(name));
-            Hash = crc.Hash;
+            Hash = crc.ComputeHash(Encoding.UTF8.GetBytes(name));
             for (int i = 0; i < Hash.Length; i++)
             {
                 Hash[i] = (byte)(255 - Hash[i]);

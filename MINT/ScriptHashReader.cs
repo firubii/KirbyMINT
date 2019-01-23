@@ -5,16 +5,17 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using MINT;
+using Crc32C;
 
 namespace MINT
 {
     public class ScriptHashReader
     {
-        public List<string> hashes = new List<string>();
+        public Dictionary<uint, string> hashes = new Dictionary<uint, string>();
 
         public ScriptHashReader(byte[] script)
         {
-            hashes = new List<string>();
+            hashes = new Dictionary<uint, string>();
             using (BinaryReader reader = new BinaryReader(new MemoryStream(script)))
             {
                 Read(reader);
@@ -43,7 +44,11 @@ namespace MINT
                 uint methodlist = reader.ReadUInt32();
                 reader.BaseStream.Seek(nameoffset, SeekOrigin.Begin);
                 string name = Encoding.UTF8.GetString(reader.ReadBytes(reader.ReadInt32()));
-                hashes.Add($"{BitConverter.ToUInt32(hash, 0).ToString("X8")} {name}");
+                uint classhash = BitConverter.ToUInt32(hash, 0);
+                if (!hashes.ContainsKey(classhash))
+                {
+                    hashes.Add(classhash, name);
+                }
                 reader.BaseStream.Seek(varlist, SeekOrigin.Begin);
                 uint varcount = reader.ReadUInt32();
                 List<uint> varoffsets = new List<uint>();
@@ -56,9 +61,17 @@ namespace MINT
                     reader.BaseStream.Seek(varoffsets[v], SeekOrigin.Begin);
                     uint varnameoffset = reader.ReadUInt32();
                     byte[] varhash = reader.ReadBytes(0x4);
+                    uint vartypeoffset = reader.ReadUInt32();
                     reader.BaseStream.Seek(varnameoffset, SeekOrigin.Begin);
                     string varname = Encoding.UTF8.GetString(reader.ReadBytes(reader.ReadInt32()));
-                    hashes.Add($"{BitConverter.ToUInt32(varhash, 0).ToString("X8")} {name}.{varname}");
+                    reader.BaseStream.Seek(vartypeoffset, SeekOrigin.Begin);
+                    string vartype = Encoding.UTF8.GetString(reader.ReadBytes(reader.ReadInt32()));
+                    uint typehash = BitConverter.ToUInt32(new ScriptHashCalculator(vartype).Hash, 0);
+                    if (!hashes.ContainsKey(typehash))
+                    {
+                        hashes.Add(typehash, vartype);
+                    }
+                    hashes.Add(BitConverter.ToUInt32(varhash, 0), $"{name}.{varname}");
                 }
                 reader.BaseStream.Seek(methodlist, SeekOrigin.Begin);
                 uint methodcount = reader.ReadUInt32();
@@ -88,7 +101,23 @@ namespace MINT
                             break;
                         }
                     }
-                    hashes.Add($"{BitConverter.ToUInt32(methodhash, 0).ToString("X8")} {name}.{methodname}");
+                    if (splitname[0] == "const")
+                    {
+                        uint typehash = BitConverter.ToUInt32(new ScriptHashCalculator(splitname[1]).Hash, 0);
+                        if (!hashes.ContainsKey(typehash))
+                        {
+                            hashes.Add(typehash, splitname[1]);
+                        }
+                    }
+                    else
+                    {
+                        uint typehash = BitConverter.ToUInt32(new ScriptHashCalculator(splitname[0]).Hash, 0);
+                        if (!hashes.ContainsKey(typehash))
+                        {
+                            hashes.Add(typehash, splitname[0]);
+                        }
+                    }
+                    hashes.Add(BitConverter.ToUInt32(methodhash, 0), $"{name}.{methodname}");
                 }
             }
         }
