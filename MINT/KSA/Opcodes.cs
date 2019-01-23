@@ -105,9 +105,8 @@ namespace MINT.KSA
             {0x5C, "unk_5C" },
             {0x5D, "unk_5D" },
             {0x5E, "unk_5E" },
-
             {0x5F, "unk_5F" },
-
+            {0x60, "unk_60" },
             {0x61, "unk_61" },
 
             {0x63, "unk_63" },
@@ -212,9 +211,8 @@ namespace MINT.KSA
             {0x5C, Format.xZV },
             {0x5D, Format.ZXY },
             {0x5E, Format.xZV },
-
             {0x5F, Format.ZX },
-
+            {0x60, Format.ZX },
             {0x61, Format.ZX },
 
             {0x63, Format.ZX },
