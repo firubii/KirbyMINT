@@ -119,13 +119,13 @@ namespace MINT.KSA
                     string vartype = Encoding.UTF8.GetString(reader.ReadBytes(reader.ReadInt32()));
 
                     string varflagText = "";
-                    if (varflags != 0)
+                    /*if (varflags != 0)
                     {
                         if ((varflags & (1 << 0)) != 0)
                         {
                             varflagText += "init ";
                         }
-                    }
+                    }*/
 
                     script.Add($"\t\t[{varflags}] {varflagText}{vartype} {varname}");
                 }
@@ -163,7 +163,7 @@ namespace MINT.KSA
                     string methodname = Encoding.UTF8.GetString(reader.ReadBytes(reader.ReadInt32()));
                     
                     string methodflagText = "";
-                    if (methodflags != 0)
+                    /*if (methodflags != 0)
                     {
                         if ((methodflags & (1 << 2)) != 0)
                         {
@@ -173,7 +173,7 @@ namespace MINT.KSA
                         {
                             methodflagText += "init ";
                         }
-                    }
+                    }*/
 
                     script.Add($"\n\t\t[{methodflags}] {methodflagText}{methodname}");
                     script.Add("\t\t{");
