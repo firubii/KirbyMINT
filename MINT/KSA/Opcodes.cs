@@ -98,7 +98,6 @@ namespace MINT.KSA
             {0x55, "unk_55" },
 
             {0x57, "unk_57" },
-
             {0x58, "unk_58" },
             {0x59, "unk_59" },
             {0x5A, "unk_5A" },
@@ -109,7 +108,10 @@ namespace MINT.KSA
 
             {0x5F, "unk_5F" },
 
+            {0x61, "unk_61" },
+
             {0x63, "unk_63" },
+
             {0x67, "unk_67" },
 
             {0x6A, "unk_6A" },
@@ -202,8 +204,7 @@ namespace MINT.KSA
             {0x54, Format.xZV },
             {0x55, Format.xZV },
 
-            {0x57, Format.ZXY },
-
+            {0x57, Format.ZXxY },
             {0x58, Format.Z },
             {0x59, Format.ZX },
             {0x5A, Format.ZX },
@@ -213,6 +214,8 @@ namespace MINT.KSA
             {0x5E, Format.xZV },
 
             {0x5F, Format.ZX },
+
+            {0x61, Format.ZX },
 
             {0x63, Format.ZX },
 
