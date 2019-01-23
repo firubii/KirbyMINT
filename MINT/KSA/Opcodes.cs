@@ -110,10 +110,13 @@ namespace MINT.KSA
             {0x61, "unk_61" },
 
             {0x63, "unk_63" },
+            {0x64, "unk_64" },
 
+            {0x66, "unk_66" },
             {0x67, "unk_67" },
 
             {0x6A, "unk_6A" },
+            {0x6B, "unk_6B" }
         };
         public Dictionary<byte, Format> opcodeFormats = new Dictionary<byte, Format>()
         {
@@ -216,10 +219,13 @@ namespace MINT.KSA
             {0x61, Format.ZX },
 
             {0x63, Format.ZX },
+            {0x64, Format.ZX },
 
+            {0x66, Format.xZV },
             {0x67, Format.xZV },
 
             {0x6A, Format.ZX },
+            {0x6B, Format.xZX },
         };
     }
 }

@@ -415,6 +415,7 @@ namespace MINT.KSA
                         else
                         {
                             script.Add("\t\t\t" + $"{w.ToString("X2")} {z.ToString("X2")} {x.ToString("X2")} {y.ToString("X2")}");
+                            //Console.WriteLine($"{scriptname}:{script.Count} - {w.ToString("X2")} {z.ToString("X2")} {x.ToString("X2")} {y.ToString("X2")}");
                         }
                         if (w == 0x48)
                         {
