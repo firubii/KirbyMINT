@@ -23,7 +23,7 @@ namespace MINT.KSA
             {0x0A, "loadArrayIndex32" },
             {0x0B, "loadPointer64" },
             {0x0C, "loadArrayIndex64" },
-            {0x0D, "loadArrayIndex64[2]" },
+            {0x0D, "loadArrayIndex64[1]" },
             {0x0E, "loadXref" },
             {0x0F, "loadXref" },
             {0x10, "deref" },
