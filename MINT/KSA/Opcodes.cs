@@ -89,7 +89,6 @@ namespace MINT.KSA
             {0x4C, "callExternal3" },
 
             {0x4F, "yield" },
-
             {0x50, "unk_50" },
             {0x51, "unk_51" },
 
@@ -108,13 +107,14 @@ namespace MINT.KSA
             {0x5F, "unk_5F" },
             {0x60, "unk_60" },
             {0x61, "unk_61" },
-
+            {0x62, "unk_62" },
             {0x63, "unk_63" },
             {0x64, "unk_64" },
 
             {0x66, "unk_66" },
             {0x67, "unk_67" },
-
+            {0x68, "unk_68" },
+            {0x69, "unk_69" },
             {0x6A, "unk_6A" },
             {0x6B, "unk_6B" }
         };
@@ -198,7 +198,6 @@ namespace MINT.KSA
             {0x4C, Format.xZV },
 
             {0x4F, Format.Z },
-
             {0x50, Format.ZXY },
             {0x51, Format.ZXxY },
 
@@ -217,13 +216,14 @@ namespace MINT.KSA
             {0x5F, Format.ZX },
             {0x60, Format.ZX },
             {0x61, Format.ZX },
-
+            {0x62, Format.ZX },
             {0x63, Format.ZX },
             {0x64, Format.ZX },
-
+            
             {0x66, Format.xZV },
             {0x67, Format.xZV },
-
+            {0x68, Format.sZV },
+            {0x69, Format.xZV },
             {0x6A, Format.ZX },
             {0x6B, Format.xZX },
         };

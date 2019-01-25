@@ -187,6 +187,8 @@ namespace MINT.KSA
                         byte y = reader.ReadByte();
                         ushort v = BitConverter.ToUInt16(new byte[] { x, y }, 0);
                         short sv = BitConverter.ToInt16(new byte[] { x, y }, 0);
+                        if (w == 0x56)
+                            Console.WriteLine($"{scriptname}:{script.Count} - {w.ToString("X2")} {z.ToString("X2")} {x.ToString("X2")} {y.ToString("X2")}");
                         if (opcodes.opcodeNames.Keys.Contains(w))
                         {
                             try
@@ -332,7 +334,7 @@ namespace MINT.KSA
                                             cmd += $" r{z.ToString("X2")}, ";
                                             if (x >= 0x80)
                                             {
-                                                cmd += $"0x{BitConverter.ToUInt32(sdata, x - 128).ToString("X")}, ";
+                                                cmd += $"0x{BitConverter.ToUInt32(sdata, 4 * (x - 128)).ToString("X")}, ";
                                             }
                                             else
                                             {
@@ -340,7 +342,7 @@ namespace MINT.KSA
                                             }
                                             if (y >= 0x80)
                                             {
-                                                cmd += $"0x{BitConverter.ToUInt32(sdata, y - 128).ToString("X")}";
+                                                cmd += $"0x{BitConverter.ToUInt32(sdata, 4 *  (y - 128)).ToString("X")}";
                                             }
                                             else
                                             {
@@ -354,7 +356,7 @@ namespace MINT.KSA
                                             if (x >= 0x80)
                                             {
                                                 string strV = "";
-                                                for (int s = x - 128; s < sdata.Length; s++)
+                                                for (int s = 4 * (x - 128); s < sdata.Length; s++)
                                                 {
                                                     if (sdata[s] != 0x00)
                                                     {
@@ -374,7 +376,7 @@ namespace MINT.KSA
                                             if (y >= 0x80)
                                             {
                                                 string strV = "";
-                                                for (int s = y - 128; s < sdata.Length; s++)
+                                                for (int s = 4 * (y - 128); s < sdata.Length; s++)
                                                 {
                                                     if (sdata[s] != 0x00)
                                                     {
@@ -415,7 +417,6 @@ namespace MINT.KSA
                         else
                         {
                             script.Add("\t\t\t" + $"{w.ToString("X2")} {z.ToString("X2")} {x.ToString("X2")} {y.ToString("X2")}");
-                            //Console.WriteLine($"{scriptname}:{script.Count} - {w.ToString("X2")} {z.ToString("X2")} {x.ToString("X2")} {y.ToString("X2")}");
                         }
                         if (w == 0x48)
                         {
