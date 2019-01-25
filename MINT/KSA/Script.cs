@@ -187,8 +187,8 @@ namespace MINT.KSA
                         byte y = reader.ReadByte();
                         ushort v = BitConverter.ToUInt16(new byte[] { x, y }, 0);
                         short sv = BitConverter.ToInt16(new byte[] { x, y }, 0);
-                        if (w == 0x56)
-                            Console.WriteLine($"{scriptname}:{script.Count} - {w.ToString("X2")} {z.ToString("X2")} {x.ToString("X2")} {y.ToString("X2")}");
+                        //if (w == 0x56)
+                        //    Console.WriteLine($"{scriptname}:{script.Count} - {w.ToString("X2")} {z.ToString("X2")} {x.ToString("X2")} {y.ToString("X2")}");
                         if (opcodes.opcodeNames.Keys.Contains(w))
                         {
                             try
