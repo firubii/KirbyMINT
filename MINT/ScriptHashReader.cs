@@ -12,6 +12,7 @@ namespace MINT
     public class ScriptHashReader
     {
         public Dictionary<uint, string> hashes = new Dictionary<uint, string>();
+        public List<uint> unknownHashes = new List<uint>();
 
         public ScriptHashReader(byte[] script)
         {
@@ -19,6 +20,13 @@ namespace MINT
             using (BinaryReader reader = new BinaryReader(new MemoryStream(script)))
             {
                 Read(reader);
+            }
+        }
+        public ScriptHashReader(byte[] script, Dictionary<uint, string> hashList)
+        {
+            using (BinaryReader reader = new BinaryReader(new MemoryStream(script)))
+            {
+                ReadUnknownHashes(reader, hashList);
             }
         }
 
@@ -118,6 +126,24 @@ namespace MINT
                         }
                     }
                     hashes.Add(BitConverter.ToUInt32(methodhash, 0), $"{name}.{methodname}");
+                }
+            }
+        }
+
+        public void ReadUnknownHashes(BinaryReader reader, Dictionary<uint, string> hashList)
+        {
+            reader.BaseStream.Seek(0x18, SeekOrigin.Begin);
+            uint xreflist = reader.ReadUInt32();
+            reader.BaseStream.Seek(xreflist, SeekOrigin.Begin);
+            uint xrefcount = reader.ReadUInt32();
+            List<string> xref = new List<string>();
+            for (int i = 0; i < xrefcount; i++)
+            {
+                byte[] hash = reader.ReadBytes(0x4);
+                uint xrefHash = uint.Parse(BitConverter.ToUInt32(hash, 0).ToString("X8"), System.Globalization.NumberStyles.HexNumber);
+                if (!hashList.ContainsKey(xrefHash))
+                {
+                    unknownHashes.Add(xrefHash);
                 }
             }
         }

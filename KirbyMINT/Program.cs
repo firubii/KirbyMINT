@@ -261,6 +261,101 @@ namespace KirbyMINT
                         Console.WriteLine($"\nFinished. Operation completed in {(w.Elapsed.Minutes * 60) + w.Elapsed.Seconds}.{w.Elapsed.Milliseconds}s.");
                     }
                 }
+                else if (args.Contains("-uhash"))
+                {
+                    if (args.Contains("-h"))
+                    {
+                        int hindex = args.ToList().IndexOf("-h") + 1;
+                        int index = args.ToList().IndexOf("-uhash") + 1;
+                        Dictionary<uint, string> hashList = new Dictionary<uint, string>();
+                        string[] hashFile = File.ReadAllLines(args[hindex]);
+                        for (int i = 0; i < hashFile.Length; i++)
+                        {
+                            hashList.Add(uint.Parse(string.Join("", hashFile[i].Take(8)), System.Globalization.NumberStyles.HexNumber), string.Join("", hashFile[i].Skip(9)));
+                        }
+                        if (args[index].EndsWith(".bin") && File.Exists(args[index]))
+                        {
+                            Archive archive = new Archive(args[index]);
+                            List<uint> unknownHashes = new List<uint>();
+                            System.Diagnostics.Stopwatch w = System.Diagnostics.Stopwatch.StartNew();
+                            Console.Write("Reading unknown hashes...");
+                            int progress = 1;
+                            foreach (KeyValuePair<string, byte[]> pair in archive.files)
+                            {
+                                Console.Write($"\rReading unknown hashes... {progress}/{archive.files.Count} - {(int)(((float)progress / (float)archive.files.Count) * 100)}%");
+                                ScriptHashReader scriptHashReader = new ScriptHashReader(pair.Value, hashList);
+                                unknownHashes.AddRange(scriptHashReader.unknownHashes);
+                                progress++;
+                            }
+                            string output;
+                            if (args.Contains("-o"))
+                            {
+                                int dIndex = args.ToList().IndexOf("-o") + 1;
+                                output = args[dIndex];
+                            }
+                            else
+                            {
+                                output = Directory.GetCurrentDirectory() + "\\unk_hash_" + archive.game.ToString().ToLower() + ".txt";
+                            }
+                            List<string> hashTxt = new List<string>();
+                            for (int i = 0; i < unknownHashes.Count; i++)
+                            {
+                                hashTxt.Add($"{unknownHashes[i].ToString("X8")}");
+                            }
+                            File.WriteAllLines(output, hashTxt);
+                            w.Stop();
+                            Console.WriteLine($"\nFinished. Operation completed in {(w.Elapsed.Minutes * 60) + w.Elapsed.Seconds}.{w.Elapsed.Milliseconds}s.");
+                        }
+                        else if (Directory.Exists(args[index]))
+                        {
+                            List<uint> unknownHashes = new List<uint>();
+                            Archive archive = new Archive();
+                            string[] files = Directory.GetFiles(args[index], "*.bin");
+                            System.Diagnostics.Stopwatch w = System.Diagnostics.Stopwatch.StartNew();
+                            for (int i = 0; i < files.Length; i++)
+                            {
+                                Console.Write("\nReading unknown hashes from archive " + files[i]);
+                                archive = new Archive(files[i]);
+                                int progress = 1;
+                                foreach (KeyValuePair<string, byte[]> pair in archive.files)
+                                {
+                                    Console.Write($"\rReading unknown hashes from archive {files[i]} - {progress}/{archive.files.Count} - {(int)(((float)progress / (float)archive.files.Count) * 100)}%");
+                                    ScriptHashReader scriptHashReader = new ScriptHashReader(pair.Value, hashList);
+                                    for (int h = 0; h < scriptHashReader.unknownHashes.Count; h++)
+                                    {
+                                        if (!unknownHashes.Contains(scriptHashReader.unknownHashes[h]))
+                                        {
+                                            unknownHashes.Add(scriptHashReader.unknownHashes[h]);
+                                        }
+                                    }
+                                    progress++;
+                                }
+                            }
+                            string output;
+                            if (args.Contains("-o"))
+                            {
+                                int dIndex = args.ToList().IndexOf("-o") + 1;
+                                output = args[dIndex];
+                            }
+                            else
+                            {
+                                output = Directory.GetCurrentDirectory() + "\\unk_hash_" + archive.game.ToString().ToLower() + ".txt";
+                            }
+                            List<string> hashTxt = new List<string>();
+                            for (int i = 0; i < unknownHashes.Count; i++)
+                            {
+                                hashTxt.Add($"{unknownHashes[i].ToString("X8")}");
+                            }
+                            File.WriteAllLines(output, hashTxt);
+                            w.Stop();
+                            Console.WriteLine($"\nFinished. Operation completed in {(w.Elapsed.Minutes * 60) + w.Elapsed.Seconds}.{w.Elapsed.Milliseconds}s.");
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("Must supply hash file with -h");
+                    }
+                }
             }
         }
     }
