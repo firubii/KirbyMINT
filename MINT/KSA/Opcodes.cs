@@ -227,7 +227,7 @@ namespace MINT.KSA
             {0x68, Format.sZV },
             {0x69, Format.xZV },
             {0x6A, Format.ZX },
-            {0x6B, Format.xZX },
+            {0x6B, Format.xZV },
         };
     }
 }
