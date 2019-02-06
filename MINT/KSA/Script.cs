@@ -559,7 +559,7 @@ namespace MINT.KSA
                                         b = str.ToArray();
                                         for (int c = 0; c < sdata.Count; c++)
                                         {
-                                            if (BitConverter.ToUInt32(b, 0) == BitConverter.ToUInt32(sdata[c], 0))
+                                            if (Encoding.UTF8.GetString(str.ToArray()) == Encoding.UTF8.GetString(sdata[c]))
                                             {
                                                 break;
                                             }
@@ -568,7 +568,7 @@ namespace MINT.KSA
                                         if (o == sdataLen)
                                         {
                                             sdata.Add(b);
-                                            sdataLen += 4;
+                                            sdataLen += (uint)str.Count;
                                         }
                                         line[a] = (0x80 + (o / 4)).ToString();
                                     }
@@ -654,7 +654,7 @@ namespace MINT.KSA
                                         b = str.ToArray();
                                         for (int c = 0; c < sdata.Count; c++)
                                         {
-                                            if (BitConverter.ToUInt32(b, 0) == BitConverter.ToUInt32(sdata[c], 0))
+                                            if (Encoding.UTF8.GetString(str.ToArray()) == Encoding.UTF8.GetString(sdata[c]))
                                             {
                                                 break;
                                             }
@@ -663,7 +663,7 @@ namespace MINT.KSA
                                         if (o == sdataLen)
                                         {
                                             sdata.Add(b);
-                                            sdataLen += 4;
+                                            sdataLen += (uint)str.Count;
                                         }
                                         line[a] = o.ToString();
                                     }
