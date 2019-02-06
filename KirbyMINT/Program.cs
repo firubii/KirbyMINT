@@ -211,7 +211,7 @@ namespace KirbyMINT
                         System.Diagnostics.Stopwatch w = System.Diagnostics.Stopwatch.StartNew();
                         Archive archive = new Archive(args[index], args[index] + ".bin");
                         w.Stop();
-                        Console.WriteLine($"\nFinished. Operation completed in {(w.Elapsed.Minutes * 60) + w.Elapsed.Seconds}.{w.Elapsed.Milliseconds}s.");
+                        Console.WriteLine($"Finished. Operation completed in {(w.Elapsed.Minutes * 60) + w.Elapsed.Seconds}.{w.Elapsed.Milliseconds}s.");
                     }
                 }
                 else if (args.Contains("-bin"))

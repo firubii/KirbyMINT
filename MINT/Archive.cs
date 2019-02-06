@@ -10,6 +10,15 @@ namespace MINT
 {
     public class Archive
     {
+        private struct Dir
+        {
+            public string Name;
+            public uint FileCount;
+            public uint DirCount;
+            public uint ID;
+            public uint ParentID;
+        }
+
         public Dictionary<string, byte[]> files = new Dictionary<string, byte[]>();
         public Game game;
 
@@ -63,22 +72,80 @@ namespace MINT
 
         public void Write(string dir, string output)
         {
-            string[] dirs = Directory.GetDirectories(dir, "*", SearchOption.AllDirectories);
-            string[] files = Directory.GetFiles(dir, "*.mint", SearchOption.AllDirectories);
+            string rootDir = Directory.GetParent(dir).FullName + "\\" + dir.Split('\\').Last();
+            string[] dirs = Directory.GetDirectories(rootDir, "*", SearchOption.AllDirectories);
+            string[] files = Directory.GetFiles(rootDir, "*.mint", SearchOption.AllDirectories);
             List<string> fileNames = new List<string>();
             for (int i = 0; i < files.Length; i++)
             {
-                fileNames.Add(files[i].Remove(files[i].Length - 5, 5).Remove(0, dir.Length + 1).Replace('\\', '.'));
+                fileNames.Add(files[i].Remove(files[i].Length - 5, 5).Remove(0, rootDir.Length).TrimStart(new char[] { '\\' }).Replace('\\', '.'));
             }
             BinaryWriter writer = new BinaryWriter(new FileStream(output, FileMode.Create));
             writer.Write(new byte[] {
                 0x58, 0x42, 0x49, 0x4E, 0x34, 0x12, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0xE9, 0xFD, 0x00, 0x00,
-                0x02, 0x01, 0x05, 0x01, 0x00, 0x00, 0x00, 0x00, 0x24, 0x00, 0x00, 0x00 });
+                0x02, 0x01, 0x05, 0x01 });
+            writer.Write(dirs.Length);
+            writer.Write(0x24);
             writer.Write(files.Length);
-            writer.Write(0x30);
             writer.Write(0);
             writer.Write(0);
             writer.Write(0);
+            writer.Write(0);
+
+            Console.WriteLine("Creating directory data...");
+            List<Dir> dirData = new List<Dir>();
+            Dictionary<string, uint> ids = new Dictionary<string, uint>();
+            uint id = 0;
+            for (int i = 0; i < dirs.Length; i++)
+            {
+                Dir d = new Dir();
+                d.Name = dirs[i].Remove(0, rootDir.Length).TrimStart(new char[] { '\\' }).Replace('\\', '.');
+                d.FileCount = (uint)Directory.GetFiles(dirs[i], "*.mint", SearchOption.TopDirectoryOnly).Length;
+                d.DirCount = (uint)Directory.GetDirectories(dirs[i], "*", SearchOption.TopDirectoryOnly).Length;
+                d.ID = id;
+                if (id != 0)
+                {
+                    d.ParentID = ids[Directory.GetParent(dirs[i]).FullName.Remove(0, rootDir.Length).TrimStart(new char[] { '\\' }).Replace('\\', '.')];
+                }
+                else
+                {
+                    d.ParentID = 0;
+                }
+                ids.Add(d.Name, d.ID);
+                dirData.Add(d);
+                id++;
+            }
+            List<uint> dirNameOffsets = new List<uint>();
+            List<uint> pIdOffsets = new List<uint>();
+            for (int i = 0; i < dirs.Length; i++)
+            {
+                writer.Write(dirData[i].DirCount);
+                pIdOffsets.Add((uint)writer.BaseStream.Position);
+                writer.Write(0);
+                dirNameOffsets.Add((uint)writer.BaseStream.Position);
+                writer.Write(0);
+                writer.Write(dirData[i].FileCount);
+                writer.Write(dirData[i].ID);
+            }
+            Dictionary<uint, uint> w = new Dictionary<uint, uint>();
+            for (int i = 0; i < dirs.Length; i++)
+            {
+                uint o = 0;
+                if (!w.ContainsKey(dirData[i].ParentID))
+                {
+                    w.Add(dirData[i].ParentID, (uint)writer.BaseStream.Position);
+                    writer.Write(dirData[i].ParentID);
+                }
+                o = w[dirData[i].ParentID];
+                writer.BaseStream.Seek(pIdOffsets[i], SeekOrigin.Begin);
+                writer.Write(o);
+                writer.BaseStream.Seek(0, SeekOrigin.End);
+            }
+            uint pos = (uint)writer.BaseStream.Position;
+            writer.BaseStream.Seek(0x20, SeekOrigin.Begin);
+            writer.Write(pos);
+            writer.BaseStream.Seek(0, SeekOrigin.End);
+
             List<uint> nameOffsets = new List<uint>();
             List<uint> fileOffsets = new List<uint>();
             for (int i = 0; i < files.Length; i++)
@@ -90,7 +157,7 @@ namespace MINT
             }
             Console.Write("Compiling files...");
             uint progress = 1;
-            uint pos = 0;
+            pos = 0;
             for (int i = 0; i < files.Length; i++)
             {
                 //Console.WriteLine(fileNames[i]);
@@ -103,6 +170,7 @@ namespace MINT
                 writer.Write(script.compScript.ToArray());
                 progress++;
             }
+            Console.WriteLine("\nWriting names...");
             pos = (uint)writer.BaseStream.Position;
             writer.BaseStream.Seek(0x24, SeekOrigin.Begin);
             writer.Write(pos);
@@ -110,6 +178,21 @@ namespace MINT
             while ((writer.BaseStream.Length).ToString("X").Last() != '0')
             {
                 writer.Write((byte)0);
+            }
+            for (int i = 0; i < dirs.Length; i++)
+            {
+                pos = (uint)writer.BaseStream.Position;
+                writer.BaseStream.Seek(dirNameOffsets[i], SeekOrigin.Begin);
+                writer.Write(pos);
+                writer.BaseStream.Seek(0, SeekOrigin.End);
+
+                writer.Write(dirData[i].Name.Length);
+                writer.Write(Encoding.UTF8.GetBytes(dirData[i].Name));
+                while ((writer.BaseStream.Length).ToString("X").Last() != '0' && (writer.BaseStream.Length).ToString("X").Last() != '4' && (writer.BaseStream.Length).ToString("X").Last() != '8' && (writer.BaseStream.Length).ToString("X").Last() != 'C')
+                {
+                    writer.Write((byte)0);
+                }
+                writer.Write(0);
             }
             for (int i = 0; i < files.Length; i++)
             {
