@@ -103,7 +103,7 @@ namespace MINT
                 d.FileCount = (uint)Directory.GetFiles(dirs[i], "*.mint", SearchOption.TopDirectoryOnly).Length;
                 d.DirCount = (uint)Directory.GetDirectories(dirs[i], "*", SearchOption.TopDirectoryOnly).Length;
                 d.ID = id;
-                if (id != 0)
+                if (Directory.GetParent(dirs[i]).FullName.Remove(0, rootDir.Length).TrimStart(new char[] { '\\' }).Replace('\\', '.') != "")
                 {
                     d.ParentID = ids[Directory.GetParent(dirs[i]).FullName.Remove(0, rootDir.Length).TrimStart(new char[] { '\\' }).Replace('\\', '.')];
                 }
