@@ -207,9 +207,14 @@ namespace KirbyMINT
                     }
                     else
                     {
+                        string output = args[index] + ".bin";
+                        if (args.Contains("-o"))
+                        {
+                            output = args[args.ToList().IndexOf("-o") + 1];
+                        }
                         Console.WriteLine($"Compiling {args[index]}...");
                         System.Diagnostics.Stopwatch w = System.Diagnostics.Stopwatch.StartNew();
-                        Archive archive = new Archive(args[index], args[index] + ".bin");
+                        Archive archive = new Archive(args[index], output);
                         w.Stop();
                         Console.WriteLine($"Finished. Operation completed in {(w.Elapsed.Minutes * 60) + w.Elapsed.Seconds}.{w.Elapsed.Milliseconds}s.");
                     }
@@ -430,7 +435,33 @@ namespace KirbyMINT
                         Console.WriteLine("Must supply hash file with -h");
                     }
                 }
+                else if (args.Contains("-h"))
+                {
+                    PrintHelp();
+                }
+                else
+                {
+                    PrintHelp();
+                }
             }
+            else
+            {
+                PrintHelp();
+            }
+        }
+
+        static void PrintHelp()
+        {
+            Console.WriteLine("\nUsage: KirbyMINT.exe <action> [options]");
+            Console.WriteLine("\nActions:");
+            Console.WriteLine("    -x <file>:            Extract and decompile a MINT Archive");
+            Console.WriteLine("    -r <folder>:          Repack and compile a MINT Archive from a folder");
+            Console.WriteLine("    -hash <file|folder>:  Dump hashes from a MINT Archive or collection of MINT Archives");
+            Console.WriteLine("    -bin <file>:          Dump the raw data from a MINT Archive");
+            Console.WriteLine("    -h:                   Show this message");
+            Console.WriteLine("\nOptions:");
+            Console.WriteLine("    -h <file>:            For decompiling only; Specifies hash file to use");
+            Console.WriteLine("    -o <folder|file>:     Specifies output folder or file");
         }
     }
 }
