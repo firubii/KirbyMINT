@@ -20,122 +20,196 @@ namespace KirbyMINT
                 if (args.Contains("-x"))
                 {
                     int index = args.ToList().IndexOf("-x") + 1;
-                    if (args[index].EndsWith(".bin"))
+                    if (args.Contains("-f"))
                     {
-                        string dir;
-                        if (args.Contains("-o"))
+                        if (args[index].EndsWith(".bin"))
                         {
-                            int dIndex = args.ToList().IndexOf("-o") + 1;
-                            dir = args[dIndex];
-                        }
-                        else
-                        {
-                            dir = Directory.GetCurrentDirectory() + "\\MINT";
-                        }
-                        if (!Directory.Exists(dir))
-                        {
-                            Console.WriteLine("Directory does not exist! Creating...");
-                            Directory.CreateDirectory(dir);
-                        }
-                        System.Diagnostics.Stopwatch w = System.Diagnostics.Stopwatch.StartNew();
-                        Console.WriteLine("Reading archive...");
-                        Archive archive = new Archive(args[index]);
-                        Dictionary<uint, string> hashList = new Dictionary<uint, string>();
-                        Console.Write("Reading hashes...");
-                        int progress = 1;
-                        if (args.Contains("-h") && File.Exists(args[args.ToList().IndexOf("-h") + 1]))
-                        {
-                            int hindex = args.ToList().IndexOf("-h") + 1;
-                            string[] hashes = File.ReadAllLines(args[hindex]);
-                            for (int i = 0; i < hashes.Length; i++)
+                            string dir;
+                            if (args.Contains("-o"))
                             {
-                                hashList.Add(uint.Parse(string.Join("", hashes[i].Take(8)), System.Globalization.NumberStyles.HexNumber), string.Join("", hashes[i].Skip(9)));
+                                int dIndex = args.ToList().IndexOf("-o") + 1;
+                                dir = args[dIndex];
                             }
-                        }
-                        else
-                        {
-                            foreach (KeyValuePair<string, byte[]> pair in archive.files)
+                            else
                             {
-                                Console.Write($"\rReading hashes... {progress}/{archive.files.Count} - {(int)(((float)progress / (float)archive.files.Count) * 100)}%");
-                                ScriptHashReader scriptHashReader = new ScriptHashReader(archive.files[pair.Key]);
-                                foreach (KeyValuePair<uint, string> p in scriptHashReader.hashes)
+                                dir = Directory.GetCurrentDirectory() + "\\MINT";
+                            }
+                            if (!Directory.Exists(dir))
+                            {
+                                Console.WriteLine("Directory does not exist! Creating...");
+                                Directory.CreateDirectory(dir);
+                            }
+                            System.Diagnostics.Stopwatch w = System.Diagnostics.Stopwatch.StartNew();
+                            Console.WriteLine("Reading file...");
+                            byte[] file = File.ReadAllBytes(args[index]);
+                            Dictionary<uint, string> hashList = new Dictionary<uint, string>();
+                            Console.Write("Reading hashes...");
+                            int progress = 1;
+                            if (args.Contains("-h") && File.Exists(args[args.ToList().IndexOf("-h") + 1]))
+                            {
+                                int hindex = args.ToList().IndexOf("-h") + 1;
+                                string[] hashes = File.ReadAllLines(args[hindex]);
+                                for (int i = 0; i < hashes.Length; i++)
                                 {
-                                    if (!hashList.ContainsKey(p.Key))
-                                    {
-                                        hashList.Add(p.Key, p.Value);
-                                    }
+                                    hashList.Add(uint.Parse(string.Join("", hashes[i].Take(8)), System.Globalization.NumberStyles.HexNumber), string.Join("", hashes[i].Skip(9)));
                                 }
+                            }
+                            Console.WriteLine("\nDecompiling script...");
+                            MINT.KSA.Script script = new MINT.KSA.Script(file, hashList);
+                            if (!script.decompileFailure)
+                            {
+                                File.WriteAllLines(Directory.GetCurrentDirectory() + "\\output.mint", script.script);
                                 progress++;
                             }
+                            else
+                            {
+                                Console.WriteLine("Stopping.");
+                                return;
+                            }
+                            w.Stop();
+                            Console.WriteLine($"\nFinished. Operation completed in {(w.Elapsed.Minutes * 60) + w.Elapsed.Seconds}.{w.Elapsed.Milliseconds}s.");
                         }
-                        Console.Write("\nDecompiling scripts...");
-                        progress = 1;
-                        foreach (KeyValuePair<string, byte[]> pair in archive.files)
+                    }
+                    else
+                    {
+                        if (args[index].EndsWith(".bin"))
                         {
-                            if (archive.game == Game.TDX)
+                            string dir;
+                            if (args.Contains("-o"))
                             {
-                                MINT.TDX.Script script = new MINT.TDX.Script(pair.Value, hashList);
-                                if (!script.decompileFailure)
+                                int dIndex = args.ToList().IndexOf("-o") + 1;
+                                dir = args[dIndex];
+                            }
+                            else
+                            {
+                                dir = Directory.GetCurrentDirectory() + "\\MINT";
+                            }
+                            if (!Directory.Exists(dir))
+                            {
+                                Console.WriteLine("Directory does not exist! Creating...");
+                                Directory.CreateDirectory(dir);
+                            }
+                            System.Diagnostics.Stopwatch w = System.Diagnostics.Stopwatch.StartNew();
+                            Console.WriteLine("Reading archive...");
+                            Archive archive = new Archive(args[index]);
+                            Dictionary<uint, string> hashList = new Dictionary<uint, string>();
+                            Console.Write("Reading hashes...");
+                            int progress = 1;
+                            if (args.Contains("-h") && File.Exists(args[args.ToList().IndexOf("-h") + 1]))
+                            {
+                                int hindex = args.ToList().IndexOf("-h") + 1;
+                                string[] hashes = File.ReadAllLines(args[hindex]);
+                                for (int i = 0; i < hashes.Length; i++)
                                 {
-                                    Console.Write($"\rDecompiling scripts... {progress}/{archive.files.Count} - {(int)(((float)progress / (float)archive.files.Count) * 100)}%");
-                                    string name = pair.Key;
-                                    byte[] file = pair.Value;
-                                    string filedir = dir + "\\" + (name + ".mint").Replace("." + name.Split('.').Last() + ".mint", "").Replace(".", "\\");
-                                    if (!Directory.Exists(filedir))
-                                        Directory.CreateDirectory(filedir);
-                                    filedir = dir + "\\" + name.Replace(".", "\\") + ".mint";
-                                    File.WriteAllLines(filedir, script.script);
-                                    progress++;
-                                }
-                                else
-                                {
-                                    Console.WriteLine("Stopping.");
-                                    return;
+                                    hashList.Add(uint.Parse(string.Join("", hashes[i].Take(8)), System.Globalization.NumberStyles.HexNumber), string.Join("", hashes[i].Skip(9)));
                                 }
                             }
-                            else if (archive.game == Game.KPR)
+                            else
                             {
-                                MINT.KPR.Script script = new MINT.KPR.Script(pair.Value, hashList);
-                                if (!script.decompileFailure)
+                                foreach (KeyValuePair<string, byte[]> pair in archive.files)
                                 {
-                                    Console.Write($"\rDecompiling scripts... {progress}/{archive.files.Count} - {(int)(((float)progress / (float)archive.files.Count) * 100)}%");
-                                    string name = pair.Key;
-                                    byte[] file = pair.Value;
-                                    string filedir = dir + "\\" + (name + ".mint").Replace("." + name.Split('.').Last() + ".mint", "").Replace(".", "\\");
-                                    if (!Directory.Exists(filedir))
-                                        Directory.CreateDirectory(filedir);
-                                    filedir = dir + "\\" + name.Replace(".", "\\") + ".mint";
-                                    File.WriteAllLines(filedir, script.script);
+                                    Console.Write($"\rReading hashes... {progress}/{archive.files.Count} - {(int)(((float)progress / (float)archive.files.Count) * 100)}%");
+                                    ScriptHashReader scriptHashReader = new ScriptHashReader(archive.files[pair.Key]);
+                                    foreach (KeyValuePair<uint, string> p in scriptHashReader.hashes)
+                                    {
+                                        if (!hashList.ContainsKey(p.Key))
+                                        {
+                                            hashList.Add(p.Key, p.Value);
+                                        }
+                                    }
                                     progress++;
                                 }
-                                else
-                                {
-                                    Console.WriteLine("Stopping.");
-                                    return;
-                                }
                             }
-                            else if (archive.game == Game.KSA)
+                            Console.Write("\nDecompiling scripts...");
+                            progress = 1;
+                            foreach (KeyValuePair<string, byte[]> pair in archive.files)
                             {
-                                MINT.KSA.Script script = new MINT.KSA.Script(pair.Value, hashList);
-                                if (!script.decompileFailure)
+                                if (archive.game == Game.TDX)
                                 {
-                                    Console.Write($"\rDecompiling scripts... {progress}/{archive.files.Count} - {(int)(((float)progress / (float)archive.files.Count) * 100)}%");
-                                    string name = pair.Key;
-                                    byte[] file = pair.Value;
-                                    string filedir = dir + "\\" + (name + ".mint").Replace("." + name.Split('.').Last() + ".mint", "").Replace(".", "\\");
-                                    if (!Directory.Exists(filedir))
-                                        Directory.CreateDirectory(filedir);
-                                    filedir = dir + "\\" + name.Replace(".", "\\") + ".mint";
-                                    File.WriteAllLines(filedir, script.script);
-                                    progress++;
+                                    MINT.TDX.Script script = new MINT.TDX.Script(pair.Value, hashList);
+                                    if (!script.decompileFailure)
+                                    {
+                                        Console.Write($"\rDecompiling scripts... {progress}/{archive.files.Count} - {(int)(((float)progress / (float)archive.files.Count) * 100)}%");
+                                        string name = pair.Key;
+                                        byte[] file = pair.Value;
+                                        string filedir = dir + "\\" + (name + ".mint").Replace("." + name.Split('.').Last() + ".mint", "").Replace(".", "\\");
+                                        if (!Directory.Exists(filedir))
+                                            Directory.CreateDirectory(filedir);
+                                        filedir = dir + "\\" + name.Replace(".", "\\") + ".mint";
+                                        File.WriteAllLines(filedir, script.script);
+                                        progress++;
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("Stopping.");
+                                        return;
+                                    }
                                 }
-                                else
+                                else if (archive.game == Game.KPR)
                                 {
-                                    Console.WriteLine("Stopping.");
-                                    return;
+                                    MINT.KPR.Script script = new MINT.KPR.Script(pair.Value, hashList);
+                                    if (!script.decompileFailure)
+                                    {
+                                        Console.Write($"\rDecompiling scripts... {progress}/{archive.files.Count} - {(int)(((float)progress / (float)archive.files.Count) * 100)}%");
+                                        string name = pair.Key;
+                                        byte[] file = pair.Value;
+                                        string filedir = dir + "\\" + (name + ".mint").Replace("." + name.Split('.').Last() + ".mint", "").Replace(".", "\\");
+                                        if (!Directory.Exists(filedir))
+                                            Directory.CreateDirectory(filedir);
+                                        filedir = dir + "\\" + name.Replace(".", "\\") + ".mint";
+                                        File.WriteAllLines(filedir, script.script);
+                                        progress++;
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("Stopping.");
+                                        return;
+                                    }
+                                }
+                                else if (archive.game == Game.KSA)
+                                {
+                                    MINT.KSA.Script script = new MINT.KSA.Script(pair.Value, hashList);
+                                    if (!script.decompileFailure)
+                                    {
+                                        Console.Write($"\rDecompiling scripts... {progress}/{archive.files.Count} - {(int)(((float)progress / (float)archive.files.Count) * 100)}%");
+                                        string name = pair.Key;
+                                        byte[] file = pair.Value;
+                                        string filedir = dir + "\\" + (name + ".mint").Replace("." + name.Split('.').Last() + ".mint", "").Replace(".", "\\");
+                                        if (!Directory.Exists(filedir))
+                                            Directory.CreateDirectory(filedir);
+                                        filedir = dir + "\\" + name.Replace(".", "\\") + ".mint";
+                                        File.WriteAllLines(filedir, script.script);
+                                        progress++;
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("Stopping.");
+                                        return;
+                                    }
                                 }
                             }
+                            w.Stop();
+                            Console.WriteLine($"\nFinished. Operation completed in {(w.Elapsed.Minutes * 60) + w.Elapsed.Seconds}.{w.Elapsed.Milliseconds}s.");
                         }
+                    }
+                }
+                else if (args.Contains("-r"))
+                {
+                    int index = args.ToList().IndexOf("-r") + 1;
+                    if (args.Contains("-f"))
+                    {
+                        if (File.Exists(args[index]))
+                        {
+                            string[] txt = File.ReadAllLines(args[index]);
+                            MINT.KSA.Script script = new MINT.KSA.Script(txt);
+                            File.WriteAllBytes(Directory.GetCurrentDirectory() + "\\output.bin", script.compScript.ToArray());
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Compiling {args[index]}...");
+                        System.Diagnostics.Stopwatch w = System.Diagnostics.Stopwatch.StartNew();
+                        Archive archive = new Archive(args[index], args[index] + ".bin");
                         w.Stop();
                         Console.WriteLine($"\nFinished. Operation completed in {(w.Elapsed.Minutes * 60) + w.Elapsed.Seconds}.{w.Elapsed.Milliseconds}s.");
                     }
