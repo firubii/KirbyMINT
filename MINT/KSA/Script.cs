@@ -469,7 +469,7 @@ namespace MINT.KSA
                 //Script prep
                 for (int i = 0; i < script.Count; i++)
                 {
-                    script[i] = script[i].TrimStart(new char[] { '\t', ' ' }).Replace(", ", " ");
+                    script[i] = script[i].TrimStart(new char[] { '\t', ' ' });
                 }
                 for (int i = 0; i < script.Count; i++)
                 {
@@ -502,15 +502,15 @@ namespace MINT.KSA
                                     {
                                         if (line[a].StartsWith("0x"))
                                         {
-                                            b = BitConverter.GetBytes(uint.Parse(line[a].Remove(0, 2), System.Globalization.NumberStyles.HexNumber));
+                                            b = BitConverter.GetBytes(uint.Parse(line[a].Remove(0, 2).TrimEnd(new char[] { ',' }), System.Globalization.NumberStyles.HexNumber));
                                         }
                                         else if (line[a].Contains(".") || line[a].Contains("f"))
                                         {
-                                            b = BitConverter.GetBytes(float.Parse(line[a].Replace("f", "")));
+                                            b = BitConverter.GetBytes(float.Parse(line[a].Replace("f", "").TrimEnd(new char[] { ',' })));
                                         }
                                         else
                                         {
-                                            b = BitConverter.GetBytes(uint.Parse(line[a]));
+                                            b = BitConverter.GetBytes(uint.Parse(line[a].TrimEnd(new char[] { ',' })));
                                         }
                                         for (int c = 0; c < sdata.Count; c++)
                                         {
@@ -550,7 +550,7 @@ namespace MINT.KSA
                                     uint o = 0;
                                     if (f == Format.LDPstr)
                                     {
-                                        List<byte> str = Encoding.UTF8.GetBytes(line[a].Replace("\"", "")).ToList();
+                                        List<byte> str = Encoding.UTF8.GetBytes(line[a].TrimStart(new char[] { '\"' }).TrimEnd(new char[] { '\"', ',' })).ToList();
                                         str.AddRange(new byte[] { 0x00 });
                                         while (!str.Count.ToString("X").EndsWith("0") && !str.Count.ToString("X").EndsWith("4") && !str.Count.ToString("X").EndsWith("8") && !str.Count.ToString("X").EndsWith("C"))
                                         {
@@ -597,15 +597,15 @@ namespace MINT.KSA
                                     {
                                         if (line[a].StartsWith("0x"))
                                         {
-                                            b = BitConverter.GetBytes(uint.Parse(line[a].Remove(0, 2), System.Globalization.NumberStyles.HexNumber));
+                                            b = BitConverter.GetBytes(uint.Parse(line[a].Remove(0, 2).TrimEnd(new char[] { ',' }), System.Globalization.NumberStyles.HexNumber));
                                         }
                                         else if (line[a].Contains(".") || line[a].Contains("f"))
                                         {
-                                            b = BitConverter.GetBytes(float.Parse(line[a].Replace("f", "")));
+                                            b = BitConverter.GetBytes(float.Parse(line[a].Replace("f", "").TrimEnd(new char[] { ',' })));
                                         }
                                         else
                                         {
-                                            b = BitConverter.GetBytes(uint.Parse(line[a]));
+                                            b = BitConverter.GetBytes(uint.Parse(line[a].TrimEnd(new char[] { ',' })));
                                         }
                                         for (int c = 0; c < sdata.Count; c++)
                                         {
@@ -645,7 +645,7 @@ namespace MINT.KSA
                                     uint o = 0;
                                     if (f == Format.strV || f == Format.strZV)
                                     {
-                                        List<byte> str = Encoding.UTF8.GetBytes(line[a].Replace("\"", "")).ToList();
+                                        List<byte> str = Encoding.UTF8.GetBytes(line[a].TrimStart(new char[] { '\"' }).TrimEnd(new char[] { '\"', ',' })).ToList();
                                         str.AddRange(new byte[] { 0x00 });
                                         while (!str.Count.ToString("X").EndsWith("0") && !str.Count.ToString("X").EndsWith("4") && !str.Count.ToString("X").EndsWith("8") && !str.Count.ToString("X").EndsWith("C"))
                                         {
@@ -692,7 +692,7 @@ namespace MINT.KSA
                                     uint x;
                                     if (line[a].Length == 8 && !line[a].Contains("."))
                                     {
-                                        x = uint.Parse(line[a], System.Globalization.NumberStyles.HexNumber);
+                                        x = uint.Parse(line[a].TrimEnd(new char[] { ',' }), System.Globalization.NumberStyles.HexNumber);
                                     }
                                     else
                                     {
@@ -701,7 +701,7 @@ namespace MINT.KSA
                                         {
                                             str.Add(line[c]);
                                         }
-                                        ScriptHashCalculator scriptHash = new ScriptHashCalculator(string.Join(" ", str));
+                                        ScriptHashCalculator scriptHash = new ScriptHashCalculator(string.Join(" ", str).TrimEnd(new char[] { ',' }));
                                         x = BitConverter.ToUInt32(scriptHash.Hash, 0);
                                     }
                                     if (!xref.Contains(x))
@@ -732,7 +732,7 @@ namespace MINT.KSA
                                     uint x;
                                     if (line[a].Length == 8 && !line[a].Contains("."))
                                     {
-                                        x = uint.Parse(line[a], System.Globalization.NumberStyles.HexNumber);
+                                        x = uint.Parse(line[a].TrimEnd(new char[] { ',' }), System.Globalization.NumberStyles.HexNumber);
                                     }
                                     else
                                     {
@@ -741,7 +741,7 @@ namespace MINT.KSA
                                         {
                                             str.Add(line[c]);
                                         }
-                                        ScriptHashCalculator scriptHash = new ScriptHashCalculator(string.Join(" ", str));
+                                        ScriptHashCalculator scriptHash = new ScriptHashCalculator(string.Join(" ", str).TrimEnd(new char[] { ',' }));
                                         x = BitConverter.ToUInt32(scriptHash.Hash, 0);
                                     }
                                     if (!xref.Contains(x))
@@ -856,7 +856,7 @@ namespace MINT.KSA
                                     List<byte> data = new List<byte>();
                                     for (int d = c; d < script.Count; d++)
                                     {
-                                        string[] line = script[d].Split(' ');
+                                        string[] line = script[d].Replace(",", "").Split(' ');
                                         if (opcodes.opcodeNames.ContainsValue(line[0]))
                                         {
                                             byte w = opcodes.opcodeNames.FirstOrDefault(x => x.Value == line[0]).Key;
@@ -982,6 +982,7 @@ namespace MINT.KSA
                                                     {
                                                         data.Add(w);
                                                         data.Add(0xFF);
+                                                        data.Add(0xFF);
                                                         if (line.Length > 1)
                                                         {
                                                             data.Add(byte.Parse(line[1].Replace("r", ""), System.Globalization.NumberStyles.HexNumber));
@@ -990,7 +991,6 @@ namespace MINT.KSA
                                                         {
                                                             data.Add(0x00);
                                                         }
-                                                        data.Add(0xFF);
                                                         break;
                                                     }
                                             }
