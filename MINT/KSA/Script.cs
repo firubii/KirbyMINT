@@ -357,6 +357,11 @@ namespace MINT.KSA
                                             cmd += $" r{z.ToString("X2")}, r{x.ToString("X2")}, {xref[y]}";
                                             break;
                                         }
+                                    case Format.XZxY:
+                                        {
+                                            cmd += $" r{x.ToString("X2")}, r{z.ToString("X2")}, {xref[y]}";
+                                            break;
+                                        }
                                     case Format.LDP:
                                         {
                                             cmd += $" r{z.ToString("X2")}, ";
@@ -683,7 +688,7 @@ namespace MINT.KSA
                     if (opcodes.opcodeNames.ContainsValue(line[0]))
                     {
                         Format f = opcodes.opcodeFormats[opcodes.opcodeNames.FirstOrDefault(x => x.Value == line[0]).Key];
-                        if (f == Format.ZXxY)
+                        if (f == Format.ZXxY || f == Format.XZxY)
                         {
                             for (int a = 1; a < line.Length; a++)
                             {
@@ -939,6 +944,14 @@ namespace MINT.KSA
                                                         data.Add(byte.Parse(line[3]));
                                                         break;
                                                     }
+                                                case Format.XZxY:
+                                                    {
+                                                        data.Add(w);
+                                                        data.Add(byte.Parse(line[2].Replace("r", ""), System.Globalization.NumberStyles.HexNumber));
+                                                        data.Add(byte.Parse(line[1].Replace("r", ""), System.Globalization.NumberStyles.HexNumber));
+                                                        data.Add(byte.Parse(line[3]));
+                                                        break;
+                                                    }
                                                 case Format.nZXY:
                                                     {
                                                         data.Add(w);
@@ -1059,6 +1072,7 @@ namespace MINT.KSA
 
                 writer.Write(sdataraw.Count);
                 writer.Write(sdataraw.ToArray());
+                writer.Write(0);
 
                 uint pos = (uint)writer.BaseStream.Position;
                 writer.BaseStream.Seek(0x18, SeekOrigin.Begin);

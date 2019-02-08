@@ -36,6 +36,7 @@ namespace MINT
         nZXY, //3 arguments - declare statement parameters
         ZXY, //3 arguments - (register) byte 2 & byte 3 & byte 4
         XY, //2 arguments - (register) byte 3 & byte 4
+        XZxY,
         LDP, //Loads a pair (wx, wy) into rz. If x or y is above 0x80, the 32 bit data is taken from SDATA_START + x or y - 128 instead
         LDPstr, //Same as LDP except it loads a null-terminated string instead
         Ret
