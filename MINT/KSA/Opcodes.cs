@@ -105,11 +105,11 @@ namespace MINT.KSA
             {0x5C, "unk_5C" },
             {0x5D, "unk_5D" },
             {0x5E, "unk_5E" },
-            {0x5F, "unk_5F" },
+            {0x5F, "floatToInt" },
             {0x60, "unk_60" },
             {0x61, "unk_61" },
             {0x62, "unk_62" },
-            {0x63, "unk_63" },
+            {0x63, "intToFloat" },
             {0x64, "unk_64" },
 
             {0x66, "unk_66" },
