@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
-using MINT.KSA;
 
 namespace MINT
 {
@@ -177,8 +176,8 @@ namespace MINT
                 writer.BaseStream.Seek(fileOffsets[i], SeekOrigin.Begin);
                 writer.Write(pos);
                 writer.BaseStream.Seek(0, SeekOrigin.End);
-                MINT.KSA.Script script = new Script(File.ReadAllLines(files[i]));
-                writer.Write(script.compScript.ToArray());
+                Script script = new Script(File.ReadAllLines(files[i]), game);
+                writer.Write(script.CompiledScript.ToArray());
                 progress++;
             }
             Console.WriteLine("\nWriting names...");
