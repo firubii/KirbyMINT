@@ -8,6 +8,7 @@ namespace MINT
 {
     public enum Game
     {
+        RDL,
         TDX,
         KPR,
         KSA
@@ -39,6 +40,8 @@ namespace MINT
         XZxY,
         LDP, //Loads a pair (wx, wy) into rz. If x or y is above 0x80, the 32 bit data is taken from SDATA_START + x or y - 128 instead
         LDPstr, //Same as LDP except it loads a null-terminated string instead
-        Ret
+        Ret,
+        RetX,
+        RetY
     }
 }
