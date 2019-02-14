@@ -257,6 +257,7 @@ namespace MINT
                                             cmd += $" r{x.ToString("X2")}";
                                             break;
                                         }
+                                    case Format.RetY:
                                     case Format.Y:
                                         {
                                             cmd += $" r{y.ToString("X2")}";
@@ -449,9 +450,12 @@ namespace MINT
                                         }
                                     case Format.Ret:
                                         {
-                                            if ((methodflags & (1 << 7)) != 0)
+                                            if (game == Game.KSA)
                                             {
-                                                cmd += $" r{y.ToString("X2")}";
+                                                if ((methodflags & (1 << 7)) != 0)
+                                                {
+                                                    cmd += $" r{y.ToString("X2")}";
+                                                }
                                             }
                                             break;
                                         }
@@ -470,7 +474,7 @@ namespace MINT
                         {
                             DecompiledScript.Add("\t\t\t" + $"{w.ToString("X2")} {z.ToString("X2")} {x.ToString("X2")} {y.ToString("X2")}");
                         }
-                        if (w == 0x48)
+                        if (opcodeFormats[w] == Format.Ret || opcodeFormats[w] == Format.RetY)
                         {
                             break;
                         }
