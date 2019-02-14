@@ -30,8 +30,9 @@ namespace MINT
                 Read(reader);
             }
         }
-        public Archive(string dir, string output)
+        public Archive(string dir, string output, Game g)
         {
+            game = g;
             Write(dir, output);
         }
 
@@ -81,9 +82,19 @@ namespace MINT
                 fileNames.Add(files[i].Remove(files[i].Length - 5, 5).Remove(0, rootDir.Length).TrimStart(new char[] { '\\' }).Replace('\\', '.'));
             }
             BinaryWriter writer = new BinaryWriter(new FileStream(output, FileMode.Create));
-            writer.Write(new byte[] {
-                0x58, 0x42, 0x49, 0x4E, 0x34, 0x12, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0xE9, 0xFD, 0x00, 0x00,
-                0x02, 0x01, 0x05, 0x01 });
+            writer.Write(new byte[] { 0x58, 0x42, 0x49, 0x4E, 0x34, 0x12, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0xE9, 0xFD, 0x00, 0x00 });
+            if (game == Game.TDX)
+            {
+                writer.Write(327681);
+            }
+            else if (game == Game.KPR)
+            {
+                writer.Write(196865);
+            }
+            else if (game == Game.KSA)
+            {
+                writer.Write(17105154);
+            }
             writer.Write(dirs.Length);
             writer.Write(0x24);
             writer.Write(files.Length);

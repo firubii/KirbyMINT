@@ -48,8 +48,10 @@
     <Compile Include="KPR\Script.cs" />
     <Compile Include="KSA\Opcodes.cs" />
     <Compile Include="KSA\Script.cs" />
+    <Compile Include="Opcodes.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Archive.cs" />
+    <Compile Include="Script.cs" />
     <Compile Include="ScriptHashCalculator.cs" />
     <Compile Include="ScriptHashReader.cs" />
     <Compile Include="TDX\Opcodes.cs" />

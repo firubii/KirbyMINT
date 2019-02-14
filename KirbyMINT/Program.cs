@@ -6,8 +6,6 @@ using System.Threading.Tasks;
 using System.IO;
 using System.Threading;
 using MINT;
-using MINT.TDX;
-using MINT.KSA;
 
 namespace KirbyMINT
 {
@@ -24,6 +22,15 @@ namespace KirbyMINT
                     {
                         if (args[index].EndsWith(".bin"))
                         {
+                            Game game = Game.KSA;
+                            if (args.Contains("-tdx"))
+                            {
+                                game = Game.TDX;
+                            }
+                            else if (args.Contains("-kpr"))
+                            {
+                                game = Game.KPR;
+                            }
                             string dir;
                             if (args.Contains("-o"))
                             {
@@ -55,10 +62,10 @@ namespace KirbyMINT
                                 }
                             }
                             Console.WriteLine("\nDecompiling script...");
-                            MINT.KSA.Script script = new MINT.KSA.Script(file, hashList);
-                            if (!script.decompileFailure)
+                            Script script = new Script(file, hashList, game);
+                            if (!script.DecompileFailure)
                             {
-                                File.WriteAllLines(Directory.GetCurrentDirectory() + "\\output.mint", script.script);
+                                File.WriteAllLines(Directory.GetCurrentDirectory() + "\\output.mint", script.DecompiledScript);
                                 progress++;
                             }
                             else
@@ -124,68 +131,23 @@ namespace KirbyMINT
                             progress = 1;
                             foreach (KeyValuePair<string, byte[]> pair in archive.files)
                             {
-                                if (archive.game == Game.TDX)
+                                Script script = new Script(pair.Value, hashList, archive.game);
+                                if (!script.DecompileFailure)
                                 {
-                                    MINT.TDX.Script script = new MINT.TDX.Script(pair.Value, hashList);
-                                    if (!script.decompileFailure)
-                                    {
-                                        Console.Write($"\rDecompiling scripts... {progress}/{archive.files.Count} - {(int)(((float)progress / (float)archive.files.Count) * 100)}%");
-                                        string name = pair.Key;
-                                        byte[] file = pair.Value;
-                                        string filedir = dir + "\\" + (name + ".mint").Replace("." + name.Split('.').Last() + ".mint", "").Replace(".", "\\");
-                                        if (!Directory.Exists(filedir))
-                                            Directory.CreateDirectory(filedir);
-                                        filedir = dir + "\\" + name.Replace(".", "\\") + ".mint";
-                                        File.WriteAllLines(filedir, script.script);
-                                        progress++;
-                                    }
-                                    else
-                                    {
-                                        Console.WriteLine("Stopping.");
-                                        return;
-                                    }
+                                    Console.Write($"\rDecompiling scripts... {progress}/{archive.files.Count} - {(int)(((float)progress / (float)archive.files.Count) * 100)}%");
+                                    string name = pair.Key;
+                                    byte[] file = pair.Value;
+                                    string filedir = dir + "\\" + (name + ".mint").Replace("." + name.Split('.').Last() + ".mint", "").Replace(".", "\\");
+                                    if (!Directory.Exists(filedir))
+                                        Directory.CreateDirectory(filedir);
+                                    filedir = dir + "\\" + name.Replace(".", "\\") + ".mint";
+                                    File.WriteAllLines(filedir, script.DecompiledScript);
+                                    progress++;
                                 }
-                                else if (archive.game == Game.KPR)
+                                else
                                 {
-                                    MINT.KPR.Script script = new MINT.KPR.Script(pair.Value, hashList);
-                                    if (!script.decompileFailure)
-                                    {
-                                        Console.Write($"\rDecompiling scripts... {progress}/{archive.files.Count} - {(int)(((float)progress / (float)archive.files.Count) * 100)}%");
-                                        string name = pair.Key;
-                                        byte[] file = pair.Value;
-                                        string filedir = dir + "\\" + (name + ".mint").Replace("." + name.Split('.').Last() + ".mint", "").Replace(".", "\\");
-                                        if (!Directory.Exists(filedir))
-                                            Directory.CreateDirectory(filedir);
-                                        filedir = dir + "\\" + name.Replace(".", "\\") + ".mint";
-                                        File.WriteAllLines(filedir, script.script);
-                                        progress++;
-                                    }
-                                    else
-                                    {
-                                        Console.WriteLine("Stopping.");
-                                        return;
-                                    }
-                                }
-                                else if (archive.game == Game.KSA)
-                                {
-                                    MINT.KSA.Script script = new MINT.KSA.Script(pair.Value, hashList);
-                                    if (!script.decompileFailure)
-                                    {
-                                        Console.Write($"\rDecompiling scripts... {progress}/{archive.files.Count} - {(int)(((float)progress / (float)archive.files.Count) * 100)}%");
-                                        string name = pair.Key;
-                                        byte[] file = pair.Value;
-                                        string filedir = dir + "\\" + (name + ".mint").Replace("." + name.Split('.').Last() + ".mint", "").Replace(".", "\\");
-                                        if (!Directory.Exists(filedir))
-                                            Directory.CreateDirectory(filedir);
-                                        filedir = dir + "\\" + name.Replace(".", "\\") + ".mint";
-                                        File.WriteAllLines(filedir, script.script);
-                                        progress++;
-                                    }
-                                    else
-                                    {
-                                        Console.WriteLine("Stopping.");
-                                        return;
-                                    }
+                                    Console.WriteLine("Stopping.");
+                                    return;
                                 }
                             }
                             w.Stop();
@@ -200,13 +162,31 @@ namespace KirbyMINT
                     {
                         if (File.Exists(args[index]))
                         {
+                            Game game = Game.KSA;
+                            if (args.Contains("-tdx"))
+                            {
+                                game = Game.TDX;
+                            }
+                            else if (args.Contains("-kpr"))
+                            {
+                                game = Game.KPR;
+                            }
                             string[] txt = File.ReadAllLines(args[index]);
-                            MINT.KSA.Script script = new MINT.KSA.Script(txt);
-                            File.WriteAllBytes(Directory.GetCurrentDirectory() + "\\output.bin", script.compScript.ToArray());
+                            Script script = new Script(txt, game);
+                            File.WriteAllBytes(Directory.GetCurrentDirectory() + "\\output.bin", script.CompiledScript.ToArray());
                         }
                     }
                     else
                     {
+                        Game game = Game.KSA;
+                        if (args.Contains("-tdx"))
+                        {
+                            game = Game.TDX;
+                        }
+                        else if (args.Contains("-kpr"))
+                        {
+                            game = Game.KPR;
+                        }
                         string output = args[index] + ".bin";
                         if (args.Contains("-o"))
                         {
@@ -214,7 +194,7 @@ namespace KirbyMINT
                         }
                         Console.WriteLine($"Compiling {args[index]}...");
                         System.Diagnostics.Stopwatch w = System.Diagnostics.Stopwatch.StartNew();
-                        Archive archive = new Archive(args[index], output);
+                        Archive archive = new Archive(args[index], output, game);
                         w.Stop();
                         Console.WriteLine($"Finished. Operation completed in {(w.Elapsed.Minutes * 60) + w.Elapsed.Seconds}.{w.Elapsed.Milliseconds}s.");
                     }
@@ -462,6 +442,9 @@ namespace KirbyMINT
             Console.WriteLine("\nOptions:");
             Console.WriteLine("    -h <file>:            For decompiling only; Specifies hash file to use");
             Console.WriteLine("    -o <folder|file>:     Specifies output folder or file");
+            Console.WriteLine("    -tdx:                 Sets target game to Kirby: Triple Deluxe");
+            Console.WriteLine("    -kpr:                 Sets target game to Kirby: Planet Robobot");
+            Console.WriteLine("    -ksa:                 Sets target game to Kirby: Star Allies (Default)");
         }
     }
 }
