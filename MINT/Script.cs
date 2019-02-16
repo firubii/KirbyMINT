@@ -310,14 +310,16 @@ namespace MINT
                                     case Format.strZV:
                                         {
                                             string strV = "";
+                                            List<byte> strBytes = new List<byte>();
                                             for (int s = v; s < sdata.Length; s++)
                                             {
                                                 if (sdata[s] != 0x00)
                                                 {
-                                                    strV += Encoding.UTF8.GetString(sdata, s, 1);
+                                                    strBytes.Add(sdata[s]);
                                                 }
                                                 else
                                                 {
+                                                    strV = Encoding.UTF8.GetString(strBytes.ToArray());
                                                     break;
                                                 }
                                             }
@@ -426,14 +428,16 @@ namespace MINT
                                             if (x >= 0x80)
                                             {
                                                 string strV = "";
+                                                List<byte> strBytes = new List<byte>();
                                                 for (int s = 4 * (x - 128); s < sdata.Length; s++)
                                                 {
                                                     if (sdata[s] != 0x00)
                                                     {
-                                                        strV += Encoding.UTF8.GetString(sdata, s, 1);
+                                                        strBytes.Add(sdata[s]);
                                                     }
                                                     else
                                                     {
+                                                        strV = Encoding.UTF8.GetString(strBytes.ToArray());
                                                         break;
                                                     }
                                                 }
@@ -446,14 +450,16 @@ namespace MINT
                                             if (y >= 0x80)
                                             {
                                                 string strV = "";
+                                                List<byte> strBytes = new List<byte>();
                                                 for (int s = 4 * (y - 128); s < sdata.Length; s++)
                                                 {
                                                     if (sdata[s] != 0x00)
                                                     {
-                                                        strV += Encoding.UTF8.GetString(sdata, s, 1);
+                                                        strBytes.Add(sdata[s]);
                                                     }
                                                     else
                                                     {
+                                                        strV = Encoding.UTF8.GetString(strBytes.ToArray());
                                                         break;
                                                     }
                                                 }
@@ -628,6 +634,7 @@ namespace MINT
                                             baseStr += " ";
                                         }
                                     }
+                                    if (baseStr.Contains(" ")) Console.WriteLine(scriptname + ": " + baseStr);
                                     byte[] b = { };
                                     uint o = 0;
                                     if (f == Format.LDPstr)
@@ -738,6 +745,7 @@ namespace MINT
                                             baseStr += " ";
                                         }
                                     }
+                                    if (baseStr.Contains(" ")) Console.WriteLine(scriptname + ": " + baseStr);
                                     byte[] b = { };
                                     uint o = 0;
                                     if (f == Format.strV || f == Format.strZV)
@@ -1539,14 +1547,16 @@ namespace MINT
                                     case Format.strV:
                                         {
                                             string strV = "";
+                                            List<byte> strBytes = new List<byte>();
                                             for (int s = v; s < sdata.Length; s++)
                                             {
                                                 if (sdata[s] != 0x00)
                                                 {
-                                                    strV += Encoding.UTF8.GetChars(sdata, s, 1);
+                                                    strBytes.Add(sdata[s]);
                                                 }
                                                 else
                                                 {
+                                                    strV = Encoding.UTF8.GetString(strBytes.ToArray());
                                                     break;
                                                 }
                                             }
