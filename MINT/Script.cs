@@ -1363,7 +1363,7 @@ namespace MINT
 
         public void ReadRDL(BigEndianBinaryReader reader)
         {
-            reader.BaseStream.Seek(0x10, SeekOrigin.Begin);
+            reader.BaseStream.Seek(0x14, SeekOrigin.Begin);
             uint scriptnameoffset = reader.ReadUInt32();
             uint sdatalist = reader.ReadUInt32();
             uint xreflist = reader.ReadUInt32();
@@ -1464,8 +1464,8 @@ namespace MINT
                         byte z = reader.ReadByte();
                         byte x = reader.ReadByte();
                         byte y = reader.ReadByte();
-                        ushort v = BitConverter.ToUInt16(new byte[] { x, y }, 0);
-                        short sv = BitConverter.ToInt16(new byte[] { x, y }, 0);
+                        ushort v = InvertEndianness(BitConverter.ToUInt16(new byte[] { x, y }, 0));
+                        short sv = InvertEndianness(BitConverter.ToInt16(new byte[] { x, y }, 0));
                         //if (w == 0x65)
                         //    Console.WriteLine($"{scriptname}:{script.Count + 1} - {w.ToString("X2")} {z.ToString("X2")} {x.ToString("X2")} {y.ToString("X2")}");
                         if (opcodeNames.Keys.Contains(w))
@@ -1498,12 +1498,12 @@ namespace MINT
                                         }
                                     case Format.sV:
                                         {
-                                            cmd += $" 0x{BitConverter.ToUInt32(sdata, v).ToString("X")}";
+                                            cmd += $" 0x{InvertEndianness(BitConverter.ToUInt32(sdata, v)).ToString("X")}";
                                             break;
                                         }
                                     case Format.sZV:
                                         {
-                                            cmd += $" r{z.ToString("X2")}, 0x{BitConverter.ToUInt32(sdata, v).ToString("X")}";
+                                            cmd += $" r{z.ToString("X2")}, 0x{InvertEndianness(BitConverter.ToUInt32(sdata, v)).ToString("X")}";
                                             break;
                                         }
                                     case Format.strV:

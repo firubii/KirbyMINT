@@ -81,7 +81,11 @@ namespace KirbyMINT
                     {
                         if (args[index].EndsWith(".bin"))
                         {
-                            bool rdl = args.Contains("-rdl");
+                            bool rdl = false;
+                            if (args.Contains("-rdl"))
+                            {
+                                rdl = true;
+                            }
                             string dir;
                             if (args.Contains("-o"))
                             {
