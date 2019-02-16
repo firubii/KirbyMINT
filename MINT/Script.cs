@@ -293,14 +293,16 @@ namespace MINT
                                     case Format.strV:
                                         {
                                             string strV = "";
+                                            List<byte> strBytes = new List<byte>();
                                             for (int s = v; s < sdata.Length; s++)
                                             {
                                                 if (sdata[s] != 0x00)
                                                 {
-                                                    strV += Encoding.UTF8.GetChars(sdata, s, 1);
+                                                    strBytes.Add(sdata[s]);
                                                 }
                                                 else
                                                 {
+                                                    strV = Encoding.UTF8.GetString(strBytes.ToArray());
                                                     break;
                                                 }
                                             }
@@ -1566,14 +1568,16 @@ namespace MINT
                                     case Format.strZV:
                                         {
                                             string strV = "";
+                                            List<byte> strBytes = new List<byte>();
                                             for (int s = v; s < sdata.Length; s++)
                                             {
                                                 if (sdata[s] != 0x00)
                                                 {
-                                                    strV += Encoding.UTF8.GetString(sdata, s, 1);
+                                                    strBytes.Add(sdata[s]);
                                                 }
                                                 else
                                                 {
+                                                    strV = Encoding.UTF8.GetString(strBytes.ToArray());
                                                     break;
                                                 }
                                             }
