@@ -81,6 +81,7 @@ namespace KirbyMINT
                     {
                         if (args[index].EndsWith(".bin"))
                         {
+                            bool rdl = args.Contains("-rdl");
                             string dir;
                             if (args.Contains("-o"))
                             {
@@ -98,33 +99,36 @@ namespace KirbyMINT
                             }
                             System.Diagnostics.Stopwatch w = System.Diagnostics.Stopwatch.StartNew();
                             Console.WriteLine("Reading archive...");
-                            Archive archive = new Archive(args[index]);
+                            Archive archive = new Archive(args[index], rdl);
                             Dictionary<uint, string> hashList = new Dictionary<uint, string>();
-                            Console.Write("Reading hashes...");
                             int progress = 1;
-                            if (args.Contains("-h") && File.Exists(args[args.ToList().IndexOf("-h") + 1]))
+                            if (!rdl)
                             {
-                                int hindex = args.ToList().IndexOf("-h") + 1;
-                                string[] hashes = File.ReadAllLines(args[hindex]);
-                                for (int i = 0; i < hashes.Length; i++)
+                                Console.Write("Reading hashes...");
+                                if (args.Contains("-h") && File.Exists(args[args.ToList().IndexOf("-h") + 1]))
                                 {
-                                    hashList.Add(uint.Parse(string.Join("", hashes[i].Take(8)), System.Globalization.NumberStyles.HexNumber), string.Join("", hashes[i].Skip(9)));
-                                }
-                            }
-                            else
-                            {
-                                foreach (KeyValuePair<string, byte[]> pair in archive.files)
-                                {
-                                    Console.Write($"\rReading hashes... {progress}/{archive.files.Count} - {(int)(((float)progress / (float)archive.files.Count) * 100)}%");
-                                    ScriptHashReader scriptHashReader = new ScriptHashReader(archive.files[pair.Key]);
-                                    foreach (KeyValuePair<uint, string> p in scriptHashReader.hashes)
+                                    int hindex = args.ToList().IndexOf("-h") + 1;
+                                    string[] hashes = File.ReadAllLines(args[hindex]);
+                                    for (int i = 0; i < hashes.Length; i++)
                                     {
-                                        if (!hashList.ContainsKey(p.Key))
-                                        {
-                                            hashList.Add(p.Key, p.Value);
-                                        }
+                                        hashList.Add(uint.Parse(string.Join("", hashes[i].Take(8)), System.Globalization.NumberStyles.HexNumber), string.Join("", hashes[i].Skip(9)));
                                     }
-                                    progress++;
+                                }
+                                else
+                                {
+                                    foreach (KeyValuePair<string, byte[]> pair in archive.files)
+                                    {
+                                        Console.Write($"\rReading hashes... {progress}/{archive.files.Count} - {(int)(((float)progress / (float)archive.files.Count) * 100)}%");
+                                        ScriptHashReader scriptHashReader = new ScriptHashReader(archive.files[pair.Key]);
+                                        foreach (KeyValuePair<uint, string> p in scriptHashReader.hashes)
+                                        {
+                                            if (!hashList.ContainsKey(p.Key))
+                                            {
+                                                hashList.Add(p.Key, p.Value);
+                                            }
+                                        }
+                                        progress++;
+                                    }
                                 }
                             }
                             Console.Write("\nDecompiling scripts...");
@@ -187,6 +191,10 @@ namespace KirbyMINT
                         {
                             game = Game.KPR;
                         }
+                        else if (args.Contains("-rdl"))
+                        {
+                            game = Game.RDL;
+                        }
                         string output = args[index] + ".bin";
                         if (args.Contains("-o"))
                         {
@@ -204,6 +212,7 @@ namespace KirbyMINT
                     int index = args.ToList().IndexOf("-bin") + 1;
                     if (args[index].EndsWith(".bin") && File.Exists(args[index]))
                     {
+                        bool rdl = args.Contains("-rdl");
                         string dir;
                         if (args.Contains("-o"))
                         {
@@ -220,7 +229,7 @@ namespace KirbyMINT
                             Directory.CreateDirectory(dir);
                         }
                         System.Diagnostics.Stopwatch w = System.Diagnostics.Stopwatch.StartNew();
-                        Archive archive = new Archive(args[index]);
+                        Archive archive = new Archive(args[index], rdl);
                         Console.Write("Extracting files...");
                         int progress = 1;
                         foreach (KeyValuePair<string, byte[]> pair in archive.files)
@@ -415,7 +424,7 @@ namespace KirbyMINT
                         Console.WriteLine("Must supply hash file with -h");
                     }
                 }
-                else if (args.Contains("-h"))
+                else if (args.Contains("-help"))
                 {
                     PrintHelp();
                 }
@@ -438,10 +447,11 @@ namespace KirbyMINT
             Console.WriteLine("    -r <folder>:          Repack and compile a MINT Archive from a folder");
             Console.WriteLine("    -hash <file|folder>:  Dump hashes from a MINT Archive or collection of MINT Archives");
             Console.WriteLine("    -bin <file>:          Dump the raw data from a MINT Archive");
-            Console.WriteLine("    -h:                   Show this message");
+            Console.WriteLine("    -help:                Show this message");
             Console.WriteLine("\nOptions:");
             Console.WriteLine("    -h <file>:            For decompiling only; Specifies hash file to use");
             Console.WriteLine("    -o <folder|file>:     Specifies output folder or file");
+            Console.WriteLine("    -rdl:                 Sets target game to Kirby's Return to Dream Land");
             Console.WriteLine("    -tdx:                 Sets target game to Kirby: Triple Deluxe");
             Console.WriteLine("    -kpr:                 Sets target game to Kirby: Planet Robobot");
             Console.WriteLine("    -ksa:                 Sets target game to Kirby: Star Allies (Default)");

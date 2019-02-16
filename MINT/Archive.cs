@@ -29,6 +29,23 @@ namespace MINT
                 Read(reader);
             }
         }
+        public Archive(string filename, bool isRtdl)
+        {
+            if (isRtdl)
+            {
+                using (BigEndianBinaryReader reader = new BigEndianBinaryReader(File.Open(filename, FileMode.Open)))
+                {
+                    ReadRDL(reader);
+                }
+            }
+            else
+            {
+                using (BinaryReader reader = new BinaryReader(File.Open(filename, FileMode.Open)))
+                {
+                    Read(reader);
+                }
+            }
+        }
         public Archive(string dir, string output, Game g)
         {
             game = g;
@@ -180,7 +197,7 @@ namespace MINT
                 writer.Write(script.CompiledScript.ToArray());
                 progress++;
             }
-            Console.WriteLine("\nWriting names...");
+            Console.WriteLine("\nWriting strings...");
             pos = (uint)writer.BaseStream.Position;
             writer.BaseStream.Seek(0x24, SeekOrigin.Begin);
             writer.Write(pos);
@@ -219,6 +236,90 @@ namespace MINT
                 }
                 writer.Write(0);
             }
+            pos = (uint)writer.BaseStream.Position;
+            writer.BaseStream.Seek(0x8, SeekOrigin.Begin);
+            writer.Write(pos);
+            writer.BaseStream.Seek(0, SeekOrigin.End);
+
+            writer.Flush();
+            writer.Dispose();
+            writer.Close();
+        }
+
+        public void ReadRDL(BigEndianBinaryReader reader)
+        {
+            reader.BaseStream.Seek(0x10, SeekOrigin.Begin);
+            uint count = reader.ReadUInt32();
+            for (int i = 0; i < count; i++)
+            {
+                uint nameOffset = reader.ReadUInt32();
+                uint fileOffset = reader.ReadUInt32();
+                uint pos = (uint)reader.BaseStream.Position;
+                reader.BaseStream.Seek(nameOffset, SeekOrigin.Begin);
+                string name = Encoding.UTF8.GetString(reader.ReadBytes(reader.ReadInt32()));
+                reader.BaseStream.Seek(fileOffset + 8, SeekOrigin.Begin);
+                int fileSize = reader.ReadInt32();
+                reader.BaseStream.Seek(-0xC, SeekOrigin.Current);
+                byte[] file = reader.ReadBytes(fileSize);
+                reader.BaseStream.Seek(pos, SeekOrigin.Begin);
+                files.Add(name, file);
+            }
+        }
+
+        public void WriteRDL(string dir, string output)
+        {
+            string rootDir = Directory.GetParent(dir).FullName + "\\" + dir.Split('\\').Last();
+            string[] files = Directory.GetFiles(rootDir, "*.mint", SearchOption.AllDirectories);
+            List<string> fileNames = new List<string>();
+            for (int i = 0; i < files.Length; i++)
+            {
+                fileNames.Add(files[i].Remove(files[i].Length - 5, 5).Remove(0, rootDir.Length).TrimStart(new char[] { '\\' }).Replace('\\', '.'));
+            }
+            BigEndianBinaryWriter writer = new BigEndianBinaryWriter(new FileStream(output, FileMode.Create));
+            writer.Write(new byte[] { 0x58, 0x42, 0x49, 0x4E, 0x12, 0x34, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFD, 0xE9 });
+            writer.Write(files.Length);
+            List<uint> nameOffsets = new List<uint>();
+            List<uint> fileOffsets = new List<uint>();
+            for (int i = 0; i < files.Length; i++)
+            {
+                nameOffsets.Add((uint)writer.BaseStream.Position);
+                writer.Write(0);
+                fileOffsets.Add((uint)writer.BaseStream.Position);
+                writer.Write(0);
+            }
+            uint pos = 0;
+            uint progress = 1;
+            for (int i = 0; i < files.Length; i++)
+            {
+                Console.Write($"\rCompiling files... {progress}/{files.Length} - {(int)(((float)progress / (float)files.Length) * 100)}%");
+                pos = (uint)writer.BaseStream.Position;
+                writer.BaseStream.Seek(fileOffsets[i], SeekOrigin.Begin);
+                writer.Write(pos);
+                writer.BaseStream.Seek(0, SeekOrigin.End);
+                Script script = new Script(File.ReadAllLines(files[i]), Game.RDL);
+                writer.Write(script.CompiledScript.ToArray());
+                progress++;
+            }
+            Console.WriteLine("\nWriting strings...");
+            for (int i = 0; i < files.Length; i++)
+            {
+                pos = (uint)writer.BaseStream.Position;
+                writer.BaseStream.Seek(nameOffsets[i], SeekOrigin.Begin);
+                writer.Write(pos);
+                writer.BaseStream.Seek(0, SeekOrigin.End);
+
+                writer.Write(fileNames[i].Length);
+                writer.Write(Encoding.UTF8.GetBytes(fileNames[i]));
+                while ((writer.BaseStream.Length).ToString("X").Last() != '0' && (writer.BaseStream.Length).ToString("X").Last() != '4' && (writer.BaseStream.Length).ToString("X").Last() != '8' && (writer.BaseStream.Length).ToString("X").Last() != 'C')
+                {
+                    writer.Write((byte)0);
+                }
+                writer.Write(0);
+            }
+            pos = (uint)writer.BaseStream.Position;
+            writer.BaseStream.Seek(0x8, SeekOrigin.Begin);
+            writer.Write(pos);
+            writer.BaseStream.Seek(0, SeekOrigin.End);
 
             writer.Flush();
             writer.Dispose();
