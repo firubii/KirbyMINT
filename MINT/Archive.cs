@@ -49,7 +49,14 @@ namespace MINT
         public Archive(string dir, string output, Game g)
         {
             game = g;
-            Write(dir, output);
+            if (g == Game.RDL)
+            {
+                WriteRDL(dir, output);
+            }
+            else
+            {
+                Write(dir, output);
+            }
         }
 
         public void Read(BinaryReader reader)

@@ -613,11 +613,26 @@ namespace MINT
                             {
                                 if (!line[a].StartsWith("r"))
                                 {
+                                    string baseStr = "";
+                                    int l = a;
+                                    for (int c = a; c < line.Length; c++)
+                                    {
+                                        baseStr += line[c];
+                                        if (line[c].EndsWith("\""))
+                                        {
+                                            a = c;
+                                            break;
+                                        }
+                                        else
+                                        {
+                                            baseStr += " ";
+                                        }
+                                    }
                                     byte[] b = { };
                                     uint o = 0;
                                     if (f == Format.LDPstr)
                                     {
-                                        List<byte> str = Encoding.UTF8.GetBytes(line[a].TrimStart(new char[] { '\"' }).TrimEnd(new char[] { '\"', ',' })).ToList();
+                                        List<byte> str = Encoding.UTF8.GetBytes(baseStr.TrimStart(new char[] { '\"' }).TrimEnd(new char[] { '\"', ',' })).ToList();
                                         str.AddRange(new byte[] { 0x00 });
                                         while (!str.Count.ToString("X").EndsWith("0") && !str.Count.ToString("X").EndsWith("4") && !str.Count.ToString("X").EndsWith("8") && !str.Count.ToString("X").EndsWith("C"))
                                         {
@@ -637,7 +652,7 @@ namespace MINT
                                             sdata.Add(b);
                                             sdataLen += (uint)str.Count;
                                         }
-                                        line[a] = (0x80 + (o / 4)).ToString();
+                                        line[l] = (0x80 + (o / 4)).ToString();
                                     }
                                 }
                             }
@@ -708,11 +723,26 @@ namespace MINT
                             {
                                 if (!line[a].StartsWith("r"))
                                 {
+                                    string baseStr = "";
+                                    int l = a;
+                                    for (int c = a; c < line.Length; c++)
+                                    {
+                                        baseStr += line[c];
+                                        if (line[c].EndsWith("\""))
+                                        {
+                                            a = c;
+                                            break;
+                                        }
+                                        else
+                                        {
+                                            baseStr += " ";
+                                        }
+                                    }
                                     byte[] b = { };
                                     uint o = 0;
                                     if (f == Format.strV || f == Format.strZV)
                                     {
-                                        List<byte> str = Encoding.UTF8.GetBytes(line[a].TrimStart(new char[] { '\"' }).TrimEnd(new char[] { '\"', ',' })).ToList();
+                                        List<byte> str = Encoding.UTF8.GetBytes(baseStr.TrimStart(new char[] { '\"' }).TrimEnd(new char[] { '\"', ',' })).ToList();
                                         str.AddRange(new byte[] { 0x00 });
                                         while (!str.Count.ToString("X").EndsWith("0") && !str.Count.ToString("X").EndsWith("4") && !str.Count.ToString("X").EndsWith("8") && !str.Count.ToString("X").EndsWith("C"))
                                         {
@@ -732,7 +762,7 @@ namespace MINT
                                             sdata.Add(b);
                                             sdataLen += (uint)str.Count;
                                         }
-                                        line[a] = o.ToString();
+                                        line[l] = o.ToString();
                                     }
                                 }
                             }
@@ -1627,8 +1657,8 @@ namespace MINT
             if (script[0].StartsWith("script "))
             {
                 Opcodes opcodes = new Opcodes();
-                Dictionary<byte, string> opcodeNames = new Dictionary<byte, string>();
-                Dictionary<byte, Format> opcodeFormats = new Dictionary<byte, Format>();
+                Dictionary<byte, string> opcodeNames = opcodes.RDL_OpcodeNames;
+                Dictionary<byte, Format> opcodeFormats = opcodes.RDL_OpcodeFormats;
 
                 string scriptname = script[0].Remove(0, 7);
 
@@ -1717,11 +1747,26 @@ namespace MINT
                             {
                                 if (!line[a].StartsWith("r"))
                                 {
+                                    string baseStr = "";
+                                    int l = a;
+                                    for (int c = a; c < line.Length; c++)
+                                    {
+                                        baseStr += line[c];
+                                        if (line[c].EndsWith("\""))
+                                        {
+                                            a = c;
+                                            break;
+                                        }
+                                        else
+                                        {
+                                            baseStr += " ";
+                                        }
+                                    }
                                     byte[] b = { };
                                     uint o = 0;
                                     if (f == Format.strV || f == Format.strZV)
                                     {
-                                        List<byte> str = Encoding.UTF8.GetBytes(line[a].TrimStart(new char[] { '\"' }).TrimEnd(new char[] { '\"', ',' })).ToList();
+                                        List<byte> str = Encoding.UTF8.GetBytes(baseStr.TrimStart(new char[] { '\"' }).TrimEnd(new char[] { '\"', ',' })).ToList();
                                         str.AddRange(new byte[] { 0x00 });
                                         while (!str.Count.ToString("X").EndsWith("0") && !str.Count.ToString("X").EndsWith("4") && !str.Count.ToString("X").EndsWith("8") && !str.Count.ToString("X").EndsWith("C"))
                                         {
@@ -1741,7 +1786,7 @@ namespace MINT
                                             sdata.Add(b);
                                             sdataLen += (uint)str.Count;
                                         }
-                                        line[a] = o.ToString();
+                                        line[l] = o.ToString();
                                     }
                                 }
                             }
@@ -1819,7 +1864,7 @@ namespace MINT
                             }
                             if (bracket == 1)
                             {
-                                if (!script[c + 1].Contains("{"))
+                                if (!script[c].Contains("{") && !script[c].Contains("}") && !script[c].Contains("(") && !script[c].Contains(")"))
                                 {
                                     Variable var = new Variable();
                                     string[] v = script[c].Split(' ');
@@ -1850,136 +1895,130 @@ namespace MINT
                             }
                             if (bracket == 2)
                             {
-                                bool _m = false;
-                                if (script[c].Contains("{"))
+                                Method method = new Method();
+                                string m = script[c];
+                                method.Name = m;
+                                c += 2;
+                                List<byte> data = new List<byte>();
+                                for (int d = c; d < script.Count; d++)
                                 {
-                                    _m = true;
-                                }
-                                else if (c + 1 < script.Count)
-                                {
-                                    if (script[c + 1].Contains("{"))
+                                    string[] line = script[d].Replace(",", "").Split(' ');
+                                    if (opcodeNames.ContainsValue(line[0]))
                                     {
-                                        _m = true;
+                                        byte w = opcodeNames.FirstOrDefault(x => x.Value == line[0]).Key;
+                                        Format f = opcodeFormats[w];
+                                        switch (f)
+                                        {
+                                            case Format.Ret:
+                                            case Format.None:
+                                                {
+                                                    data.Add(w);
+                                                    data.Add(0xFF);
+                                                    data.Add(0xFF);
+                                                    data.Add(0xFF);
+                                                    break;
+                                                }
+                                            case Format.Z:
+                                                {
+                                                    data.Add(w);
+                                                    data.Add(byte.Parse(line[1].Replace("r", ""), System.Globalization.NumberStyles.HexNumber));
+                                                    data.Add(0xFF);
+                                                    data.Add(0xFF);
+                                                    break;
+                                                }
+                                            case Format.RetX:
+                                            case Format.X:
+                                                {
+                                                    data.Add(w);
+                                                    data.Add(0xFF);
+                                                    data.Add(byte.Parse(line[1].Replace("r", ""), System.Globalization.NumberStyles.HexNumber));
+                                                    data.Add(0xFF);
+                                                    break;
+                                                }
+                                            case Format.Y:
+                                                {
+                                                    data.Add(w);
+                                                    data.Add(0xFF);
+                                                    data.Add(0xFF);
+                                                    data.Add(byte.Parse(line[1].Replace("r", ""), System.Globalization.NumberStyles.HexNumber));
+                                                    break;
+                                                }
+                                            case Format.sV:
+                                            case Format.strV:
+                                            case Format.xV:
+                                                {
+                                                    byte[] v = BitConverter.GetBytes(InvertEndianness(ushort.Parse(line[1])));
+                                                    data.Add(w);
+                                                    data.Add(0xFF);
+                                                    data.AddRange(v);
+                                                    break;
+                                                }
+                                            case Format.sZV:
+                                            case Format.strZV:
+                                            case Format.xZV:
+                                                {
+                                                    byte[] v = BitConverter.GetBytes(InvertEndianness(ushort.Parse(line[2])));
+                                                    data.Add(w);
+                                                    data.Add(byte.Parse(line[1].Replace("r", ""), System.Globalization.NumberStyles.HexNumber));
+                                                    data.AddRange(v);
+                                                    break;
+                                                }
+                                            case Format.shV:
+                                                {
+                                                    byte[] v = BitConverter.GetBytes(InvertEndianness(short.Parse(line[1])));
+                                                    data.Add(w);
+                                                    data.Add(0xFF);
+                                                    data.AddRange(v);
+                                                    break;
+                                                }
+                                            case Format.shZV:
+                                                {
+                                                    byte[] v = BitConverter.GetBytes(InvertEndianness(short.Parse(line[2])));
+                                                    data.Add(w);
+                                                    data.Add(byte.Parse(line[1].Replace("r", ""), System.Globalization.NumberStyles.HexNumber));
+                                                    data.AddRange(v);
+                                                    break;
+                                                }
+                                            case Format.ZX:
+                                                {
+                                                    data.Add(w);
+                                                    data.Add(byte.Parse(line[1].Replace("r", ""), System.Globalization.NumberStyles.HexNumber));
+                                                    data.Add(byte.Parse(line[2].Replace("r", ""), System.Globalization.NumberStyles.HexNumber));
+                                                    data.Add(0xFF);
+                                                    break;
+                                                }
+                                            case Format.aZX:
+                                                {
+                                                    data.Add(w);
+                                                    data.Add(byte.Parse(line[1].Remove(3, 1).Remove(0, 1), System.Globalization.NumberStyles.HexNumber));
+                                                    data.Add(byte.Parse(line[2].Replace("r", ""), System.Globalization.NumberStyles.HexNumber));
+                                                    data.Add(0xFF);
+                                                    break;
+                                                }
+                                            case Format.nZXY:
+                                                {
+                                                    data.Add(w);
+                                                    data.Add(byte.Parse(line[1], System.Globalization.NumberStyles.HexNumber));
+                                                    data.Add(byte.Parse(line[2], System.Globalization.NumberStyles.HexNumber));
+                                                    data.Add(0xFF);
+                                                    break;
+                                                }
+                                            case Format.ZXY:
+                                                {
+                                                    data.Add(w);
+                                                    data.Add(byte.Parse(line[1].Replace("r", ""), System.Globalization.NumberStyles.HexNumber));
+                                                    data.Add(byte.Parse(line[2].Replace("r", ""), System.Globalization.NumberStyles.HexNumber));
+                                                    data.Add(byte.Parse(line[3].Replace("r", ""), System.Globalization.NumberStyles.HexNumber));
+                                                    break;
+                                                }
+                                        }
                                     }
-                                }
-                                if (_m)
-                                {
-                                    Method method = new Method();
-                                    string m = script[c];
-                                    method.Name = m;
-                                    c += 2;
-                                    List<byte> data = new List<byte>();
-                                    for (int d = c; d < script.Count; d++)
+                                    else if (script[d] == "}")
                                     {
-                                        string[] line = script[d].Replace(",", "").Split(' ');
-                                        if (opcodeNames.ContainsValue(line[0]))
-                                        {
-                                            byte w = opcodeNames.FirstOrDefault(x => x.Value == line[0]).Key;
-                                            Format f = opcodeFormats[w];
-                                            switch (f)
-                                            {
-                                                case Format.Ret:
-                                                case Format.None:
-                                                    {
-                                                        data.Add(w);
-                                                        data.Add(0xFF);
-                                                        data.Add(0xFF);
-                                                        data.Add(0xFF);
-                                                        break;
-                                                    }
-                                                case Format.Z:
-                                                    {
-                                                        data.Add(w);
-                                                        data.Add(byte.Parse(line[1].Replace("r", ""), System.Globalization.NumberStyles.HexNumber));
-                                                        data.Add(0xFF);
-                                                        data.Add(0xFF);
-                                                        break;
-                                                    }
-                                                case Format.RetX:
-                                                case Format.X:
-                                                    {
-                                                        data.Add(w);
-                                                        data.Add(0xFF);
-                                                        data.Add(byte.Parse(line[1].Replace("r", ""), System.Globalization.NumberStyles.HexNumber));
-                                                        data.Add(0xFF);
-                                                        break;
-                                                    }
-                                                case Format.Y:
-                                                    {
-                                                        data.Add(w);
-                                                        data.Add(0xFF);
-                                                        data.Add(0xFF);
-                                                        data.Add(byte.Parse(line[1].Replace("r", ""), System.Globalization.NumberStyles.HexNumber));
-                                                        break;
-                                                    }
-                                                case Format.sV:
-                                                case Format.strV:
-                                                case Format.xV:
-                                                    {
-                                                        byte[] v = BitConverter.GetBytes(InvertEndianness(ushort.Parse(line[1])));
-                                                        data.Add(w);
-                                                        data.Add(0xFF);
-                                                        data.AddRange(v);
-                                                        break;
-                                                    }
-                                                case Format.sZV:
-                                                case Format.strZV:
-                                                case Format.xZV:
-                                                    {
-                                                        byte[] v = BitConverter.GetBytes(InvertEndianness(ushort.Parse(line[2])));
-                                                        data.Add(w);
-                                                        data.Add(byte.Parse(line[1].Replace("r", ""), System.Globalization.NumberStyles.HexNumber));
-                                                        data.AddRange(v);
-                                                        break;
-                                                    }
-                                                case Format.shV:
-                                                    {
-                                                        byte[] v = BitConverter.GetBytes(InvertEndianness(short.Parse(line[1])));
-                                                        data.Add(w);
-                                                        data.Add(0xFF);
-                                                        data.AddRange(v);
-                                                        break;
-                                                    }
-                                                case Format.shZV:
-                                                    {
-                                                        byte[] v = BitConverter.GetBytes(InvertEndianness(short.Parse(line[2])));
-                                                        data.Add(w);
-                                                        data.Add(byte.Parse(line[1].Replace("r", ""), System.Globalization.NumberStyles.HexNumber));
-                                                        data.AddRange(v);
-                                                        break;
-                                                    }
-                                                case Format.ZX:
-                                                    {
-                                                        data.Add(w);
-                                                        data.Add(byte.Parse(line[1].Replace("r", ""), System.Globalization.NumberStyles.HexNumber));
-                                                        data.Add(byte.Parse(line[2].Replace("r", ""), System.Globalization.NumberStyles.HexNumber));
-                                                        data.Add(0xFF);
-                                                        break;
-                                                    }
-                                                case Format.nZXY:
-                                                    {
-                                                        data.Add(w);
-                                                        data.Add(byte.Parse(line[1], System.Globalization.NumberStyles.HexNumber));
-                                                        data.Add(byte.Parse(line[2], System.Globalization.NumberStyles.HexNumber));
-                                                        data.Add(0xFF);
-                                                        break;
-                                                    }
-                                                case Format.ZXY:
-                                                    {
-                                                        data.Add(w);
-                                                        data.Add(byte.Parse(line[1].Replace("r", ""), System.Globalization.NumberStyles.HexNumber));
-                                                        data.Add(byte.Parse(line[2].Replace("r", ""), System.Globalization.NumberStyles.HexNumber));
-                                                        data.Add(byte.Parse(line[3].Replace("r", ""), System.Globalization.NumberStyles.HexNumber));
-                                                        break;
-                                                    }
-                                            }
-                                        }
-                                        else if (script[d] == "}")
-                                        {
-                                            method.Data = data.ToArray();
-                                            cl.Methods.Add(method);
-                                            break;
-                                        }
+                                        c = d - 1;
+                                        method.Data = data.ToArray();
+                                        cl.Methods.Add(method);
+                                        break;
                                     }
                                 }
                             }
@@ -2009,7 +2048,7 @@ namespace MINT
                 writer.Write(0);
 
                 uint pos = (uint)writer.BaseStream.Position;
-                writer.BaseStream.Seek(0x18, SeekOrigin.Begin);
+                writer.BaseStream.Seek(0x1C, SeekOrigin.Begin);
                 writer.Write(pos);
                 writer.BaseStream.Seek(0, SeekOrigin.End);
 
@@ -2022,7 +2061,7 @@ namespace MINT
                 }
 
                 pos = (uint)writer.BaseStream.Position;
-                writer.BaseStream.Seek(0x1C, SeekOrigin.Begin);
+                writer.BaseStream.Seek(0x20, SeekOrigin.Begin);
                 writer.Write(pos);
                 writer.BaseStream.Seek(0, SeekOrigin.End);
 
@@ -2102,7 +2141,7 @@ namespace MINT
                 }
 
                 pos = (uint)writer.BaseStream.Position;
-                writer.BaseStream.Seek(0x10, SeekOrigin.Begin);
+                writer.BaseStream.Seek(0x14, SeekOrigin.Begin);
                 writer.Write(pos);
                 writer.BaseStream.Seek(0, SeekOrigin.End);
 

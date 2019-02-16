@@ -31,6 +31,10 @@ namespace KirbyMINT
                             {
                                 game = Game.KPR;
                             }
+                            else if (args.Contains("-rdl"))
+                            {
+                                game = Game.RDL;
+                            }
                             string dir;
                             if (args.Contains("-o"))
                             {
@@ -50,15 +54,18 @@ namespace KirbyMINT
                             Console.WriteLine("Reading file...");
                             byte[] file = File.ReadAllBytes(args[index]);
                             Dictionary<uint, string> hashList = new Dictionary<uint, string>();
-                            Console.Write("Reading hashes...");
                             int progress = 1;
-                            if (args.Contains("-h") && File.Exists(args[args.ToList().IndexOf("-h") + 1]))
+                            if (game != Game.RDL)
                             {
-                                int hindex = args.ToList().IndexOf("-h") + 1;
-                                string[] hashes = File.ReadAllLines(args[hindex]);
-                                for (int i = 0; i < hashes.Length; i++)
+                                Console.Write("Reading hashes...");
+                                if (args.Contains("-h") && File.Exists(args[args.ToList().IndexOf("-h") + 1]))
                                 {
-                                    hashList.Add(uint.Parse(string.Join("", hashes[i].Take(8)), System.Globalization.NumberStyles.HexNumber), string.Join("", hashes[i].Skip(9)));
+                                    int hindex = args.ToList().IndexOf("-h") + 1;
+                                    string[] hashes = File.ReadAllLines(args[hindex]);
+                                    for (int i = 0; i < hashes.Length; i++)
+                                    {
+                                        hashList.Add(uint.Parse(string.Join("", hashes[i].Take(8)), System.Globalization.NumberStyles.HexNumber), string.Join("", hashes[i].Skip(9)));
+                                    }
                                 }
                             }
                             Console.WriteLine("\nDecompiling script...");
@@ -178,6 +185,10 @@ namespace KirbyMINT
                             else if (args.Contains("-kpr"))
                             {
                                 game = Game.KPR;
+                            }
+                            else if (args.Contains("-rdl"))
+                            {
+                                game = Game.RDL;
                             }
                             string[] txt = File.ReadAllLines(args[index]);
                             Script script = new Script(txt, game);
