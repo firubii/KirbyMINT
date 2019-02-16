@@ -636,7 +636,6 @@ namespace MINT
                                             baseStr += " ";
                                         }
                                     }
-                                    if (baseStr.Contains(" ")) Console.WriteLine(scriptname + ": " + baseStr);
                                     byte[] b = { };
                                     uint o = 0;
                                     if (f == Format.LDPstr)
@@ -747,7 +746,6 @@ namespace MINT
                                             baseStr += " ";
                                         }
                                     }
-                                    if (baseStr.Contains(" ")) Console.WriteLine(scriptname + ": " + baseStr);
                                     byte[] b = { };
                                     uint o = 0;
                                     if (f == Format.strV || f == Format.strZV)
