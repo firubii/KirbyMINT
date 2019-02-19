@@ -251,8 +251,8 @@ namespace MINT
                         byte y = reader.ReadByte();
                         ushort v = BitConverter.ToUInt16(new byte[] { x, y }, 0);
                         short sv = BitConverter.ToInt16(new byte[] { x, y }, 0);
-                        //if (w == 0x65)
-                        //    Console.WriteLine($"{scriptname}:{script.Count + 1} - {w.ToString("X2")} {z.ToString("X2")} {x.ToString("X2")} {y.ToString("X2")}");
+                        //if (w == 0x50)
+                        //    Console.WriteLine($"{scriptname}:{methodname} - {w.ToString("X2")} {z.ToString("X2")} {x.ToString("X2")} {y.ToString("X2")}");
                         if (opcodeNames.Keys.Contains(w))
                         {
                             try
@@ -788,7 +788,7 @@ namespace MINT
                     if (opcodeNames.ContainsValue(line[0]))
                     {
                         Format f = opcodeFormats[opcodeNames.FirstOrDefault(x => x.Value == line[0]).Key];
-                        if (f == Format.ZXxY || f == Format.XZxY)
+                        if (f == Format.xZX || f == Format.ZXxY || f == Format.XZxY)
                         {
                             for (int a = 1; a < line.Length; a++)
                             {
@@ -1033,6 +1033,15 @@ namespace MINT
                                                         data.Add(w);
                                                         data.Add(byte.Parse(line[1].Replace("r", ""), System.Globalization.NumberStyles.HexNumber));
                                                         data.Add(byte.Parse(line[2].Replace("r", ""), System.Globalization.NumberStyles.HexNumber));
+                                                        data.Add(0xFF);
+                                                        break;
+                                                    }
+                                                case Format.xZX:
+                                                    {
+                                                        byte[] v = BitConverter.GetBytes(ushort.Parse(line[2]));
+                                                        data.Add(w);
+                                                        data.Add(byte.Parse(line[1].Replace("r", ""), System.Globalization.NumberStyles.HexNumber));
+                                                        data.Add(byte.Parse(line[2]));
                                                         data.Add(0xFF);
                                                         break;
                                                     }
