@@ -80,6 +80,31 @@ namespace MINT
 
         public void Read(BinaryReader reader, Dictionary<uint, string> hashes)
         {
+            Opcodes opcodes = new Opcodes();
+            Dictionary<byte, string> opcodeNames = new Dictionary<byte, string>();
+            Dictionary<byte, Format> opcodeFormats = new Dictionary<byte, Format>();
+            switch (game)
+            {
+                case Game.TDX:
+                    {
+                        opcodeNames = opcodes.TDX_OpcodeNames;
+                        opcodeFormats = opcodes.TDX_OpcodeFormats;
+                        break;
+                    }
+                case Game.KPR:
+                    {
+                        opcodeNames = opcodes.KPR_OpcodeNames;
+                        opcodeFormats = opcodes.KPR_OpcodeFormats;
+                        break;
+                    }
+                case Game.KSA:
+                    {
+                        opcodeNames = opcodes.KSA_OpcodeNames;
+                        opcodeFormats = opcodes.KSA_OpcodeFormats;
+                        break;
+                    }
+            }
+
             reader.BaseStream.Seek(0x10, SeekOrigin.Begin);
             uint scriptnameoffset = reader.ReadUInt32();
             uint sdatalist = reader.ReadUInt32();
@@ -225,24 +250,6 @@ namespace MINT
                     DecompiledScript.Add($"\n\t\t[{methodflags}] {methodflagText}{methodname}");
                     DecompiledScript.Add("\t\t{");
                     reader.BaseStream.Seek(methoddataoffset, SeekOrigin.Begin);
-                    Opcodes opcodes = new Opcodes();
-                    Dictionary<byte, string> opcodeNames = new Dictionary<byte, string>();
-                    Dictionary<byte, Format> opcodeFormats = new Dictionary<byte, Format>();
-                    if (game == Game.TDX)
-                    {
-                        opcodeNames = opcodes.TDX_OpcodeNames;
-                        opcodeFormats = opcodes.TDX_OpcodeFormats;
-                    }
-                    else if (game == Game.KPR)
-                    {
-                        opcodeNames = opcodes.KPR_OpcodeNames;
-                        opcodeFormats = opcodes.KPR_OpcodeFormats;
-                    }
-                    else if (game == Game.KSA)
-                    {
-                        opcodeNames = opcodes.KSA_OpcodeNames;
-                        opcodeFormats = opcodes.KSA_OpcodeFormats;
-                    }
                     for (int b = 0; b < reader.BaseStream.Length; b++)
                     {
                         byte w = reader.ReadByte();
