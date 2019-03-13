@@ -258,7 +258,7 @@ namespace MINT
                         byte y = reader.ReadByte();
                         ushort v = BitConverter.ToUInt16(new byte[] { x, y }, 0);
                         short sv = BitConverter.ToInt16(new byte[] { x, y }, 0);
-                        //if (w == 0x50)
+                        //if (w == 0x5C)
                         //    Console.WriteLine($"{scriptname}:{methodname} - {w.ToString("X2")} {z.ToString("X2")} {x.ToString("X2")} {y.ToString("X2")}");
                         if (opcodeNames.Keys.Contains(w))
                         {
@@ -289,12 +289,18 @@ namespace MINT
                                         }
                                     case Format.sV:
                                         {
-                                            cmd += $" 0x{BitConverter.ToUInt32(sdata, v).ToString("X")}";
+                                            uint val = BitConverter.ToUInt32(sdata, v);
+                                            string vstring = "0x" + val.ToString("X");
+                                            if (vstring.Length == 10) vstring = BitConverter.ToSingle(sdata, v).ToString() + "f";
+                                            cmd += $" {vstring}";
                                             break;
                                         }
                                     case Format.sZV:
                                         {
-                                            cmd += $" r{z.ToString("X2")}, 0x{BitConverter.ToUInt32(sdata, v).ToString("X")}";
+                                            uint val = BitConverter.ToUInt32(sdata, v);
+                                            string vstring = "0x" + val.ToString("X");
+                                            if (vstring.Length == 10) vstring = BitConverter.ToSingle(sdata, v).ToString() + "f";
+                                            cmd += $" r{z.ToString("X2")}, {vstring}";
                                             break;
                                         }
                                     case Format.strV:
@@ -415,7 +421,10 @@ namespace MINT
                                             cmd += $" r{z.ToString("X2")}, ";
                                             if (x >= 0x80)
                                             {
-                                                cmd += $"0x{BitConverter.ToUInt32(sdata, 4 * (x - 128)).ToString("X")}, ";
+                                                uint val = BitConverter.ToUInt32(sdata, 4 * (x - 128));
+                                                string vstring = "0x" + val.ToString("X");
+                                                if (vstring.Length == 10) vstring = BitConverter.ToSingle(sdata, 4 * (x - 128)).ToString() + "f";
+                                                cmd += $"{vstring}, ";
                                             }
                                             else
                                             {
@@ -423,7 +432,10 @@ namespace MINT
                                             }
                                             if (y >= 0x80)
                                             {
-                                                cmd += $"0x{BitConverter.ToUInt32(sdata, 4 * (y - 128)).ToString("X")}";
+                                                uint val = BitConverter.ToUInt32(sdata, 4 * (y - 128));
+                                                string vstring = "0x" + val.ToString("X");
+                                                if (vstring.Length == 10) vstring = BitConverter.ToSingle(sdata, 4 * (y - 128)).ToString() + "f";
+                                                cmd += $"{vstring}";
                                             }
                                             else
                                             {
@@ -558,7 +570,7 @@ namespace MINT
                     }
                     else if (script[i].Contains("#"))
                     {
-                        script[i] = script[i].Remove(script[i].IndexOf('#'), script[i].Length - (script[i].IndexOf('#') + 1));
+                        script[i] = script[i].Remove(script[i].IndexOf('#'), script[i].Length - (script[i].IndexOf('#'))).TrimEnd(new char[] { ' ' });
                     }
                 }
 
@@ -1552,12 +1564,18 @@ namespace MINT
                                         }
                                     case Format.sV:
                                         {
-                                            cmd += $" 0x{InvertEndianness(BitConverter.ToUInt32(sdata, v)).ToString("X")}";
+                                            uint val = InvertEndianness(BitConverter.ToUInt32(sdata, v));
+                                            string vstring = "0x" + val.ToString("X");
+                                            if (vstring.Length == 10) vstring = InvertEndianness(BitConverter.ToSingle(sdata, v)).ToString() + "f";
+                                            cmd += $" {vstring}";
                                             break;
                                         }
                                     case Format.sZV:
                                         {
-                                            cmd += $" r{z.ToString("X2")}, 0x{InvertEndianness(BitConverter.ToUInt32(sdata, v)).ToString("X")}";
+                                            uint val = InvertEndianness(BitConverter.ToUInt32(sdata, v));
+                                            string vstring = "0x" + val.ToString("X");
+                                            if (vstring.Length == 10) vstring = InvertEndianness(BitConverter.ToSingle(sdata, v)).ToString() + "f";
+                                            cmd += $" r{z.ToString("X2")}, {vstring}";
                                             break;
                                         }
                                     case Format.strV:
@@ -1705,7 +1723,7 @@ namespace MINT
                     }
                     else if (script[i].Contains("#"))
                     {
-                        script[i] = script[i].Remove(script[i].IndexOf('#'), script[i].Length - (script[i].IndexOf('#') + 1));
+                        script[i] = script[i].Remove(script[i].IndexOf('#'), script[i].Length - (script[i].IndexOf('#'))).TrimEnd(new char[] { ' ' });
                     }
                 }
 
