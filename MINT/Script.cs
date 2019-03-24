@@ -425,7 +425,7 @@ namespace MINT
                                             {
                                                 uint val = BitConverter.ToUInt32(sdata, 4 * (x - 128));
                                                 string vstring = "0x" + val.ToString("X");
-                                                if (vstring.Length == 10) vstring = BitConverter.ToSingle(sdata, 4 * (x - 128)).ToString() + "f";
+                                                //if (vstring.Length == 10) vstring = BitConverter.ToSingle(sdata, 4 * (x - 128)).ToString() + "f";
                                                 cmd += $"{vstring}, ";
                                             }
                                             else
@@ -436,7 +436,7 @@ namespace MINT
                                             {
                                                 uint val = BitConverter.ToUInt32(sdata, 4 * (y - 128));
                                                 string vstring = "0x" + val.ToString("X");
-                                                if (vstring.Length == 10) vstring = BitConverter.ToSingle(sdata, 4 * (y - 128)).ToString() + "f";
+                                                //if (vstring.Length == 10) vstring = BitConverter.ToSingle(sdata, 4 * (y - 128)).ToString() + "f";
                                                 cmd += $"{vstring}";
                                             }
                                             else
