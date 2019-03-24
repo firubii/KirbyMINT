@@ -16,6 +16,7 @@ namespace MINT
         {
             public string Name;
             public uint Hash;
+            public uint Unknown;
             public uint Flags;
             public List<Variable> Variables;
             public List<Method> Methods;
@@ -163,13 +164,14 @@ namespace MINT
                 uint varlist = reader.ReadUInt32();
                 uint methodlist = reader.ReadUInt32();
                 uint constlist = reader.ReadUInt32();
+                uint unknown = reader.ReadUInt32();
                 uint flags = reader.ReadUInt32();
                 reader.BaseStream.Seek(nameoffset, SeekOrigin.Begin);
                 string name = Encoding.UTF8.GetString(reader.ReadBytes(reader.ReadInt32()));
 
                 string classflagText = "";
 
-                DecompiledScript.Add($"\n\t[{flags}] {classflagText}class {name}");
+                DecompiledScript.Add($"\n\t[{unknown}:{flags}] {classflagText}class {name}");
                 DecompiledScript.Add("\t{");
                 reader.BaseStream.Seek(varlist, SeekOrigin.Begin);
                 uint varcount = reader.ReadUInt32();
@@ -888,13 +890,17 @@ namespace MINT
                     if (script[i].Contains("class "))
                     {
                         Class cl = new Class();
-                        Regex regex = new Regex(@"\[\d+\]");
+                        Regex regex = new Regex(@"\[\d+\:\d+\]");
                         MatchCollection matches = regex.Matches(script[i]);
-                        cl.Flags = uint.Parse(matches[0].ToString().Remove(0, 1).Remove(matches[0].Length - 2, 1));
+                        string[] flUnkParam = matches[0].ToString().Remove(matches[0].Length - 1, 1).Remove(0, 1).Split(':');
+                        cl.Unknown = uint.Parse(flUnkParam[0]);
+                        cl.Flags = uint.Parse(flUnkParam[1]);
                         cl.Name = script[i].Remove(0, matches[0].Length + 7);
                         ScriptHashCalculator scriptHash = new ScriptHashCalculator(cl.Name);
                         cl.Hash = BitConverter.ToUInt32(scriptHash.Hash, 0);
                         uint bracket = 0;
+
+                        regex = new Regex(@"\[\d+\]");
 
                         cl.Variables = new List<Variable>();
                         cl.Methods = new List<Method>();
@@ -1142,6 +1148,11 @@ namespace MINT
                                             cl.Methods.Add(method);
                                             break;
                                         }
+                                        else
+                                        {
+                                            Console.WriteLine($"\n!! ERROR !!\nUnknown command reached!\nERROR DATA:\n-ORIGIN-\nSCRIPT: {scriptname}\nFUNCTION: {method.Name}\nLINE NUM: {d + 1}\nLINE: {script[d]}");
+                                            throw new Exception("UnknownCommand");
+                                        }
                                     }
                                 }
                             }
@@ -1240,11 +1251,12 @@ namespace MINT
                     clNameOffsets.Add((uint)writer.BaseStream.Position);
                     writer.Write(0);
                     writer.Write(classes[i].Hash);
-                    writer.Write((uint)writer.BaseStream.Position + 0x10);
+                    writer.Write((uint)writer.BaseStream.Position + 0x14);
                     uint mListOffset = (uint)writer.BaseStream.Position;
                     writer.Write(0);
                     uint cListOffset = (uint)writer.BaseStream.Position;
                     writer.Write(0);
+                    writer.Write(classes[i].Unknown);
                     writer.Write(classes[i].Flags);
 
                     List<uint> vOffsets = new List<uint>();
@@ -1326,7 +1338,7 @@ namespace MINT
                     mNameOffsets.Add(mn.ToArray());
                     cNameOffsets.Add(cn.ToArray());
                 }
-
+                writer.Write(0);
                 pos = (uint)writer.BaseStream.Position;
                 writer.BaseStream.Seek(0x10, SeekOrigin.Begin);
                 writer.Write(pos);
