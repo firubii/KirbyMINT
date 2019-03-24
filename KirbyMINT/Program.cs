@@ -64,7 +64,10 @@ namespace KirbyMINT
                                     string[] hashes = File.ReadAllLines(args[hindex]);
                                     for (int i = 0; i < hashes.Length; i++)
                                     {
-                                        hashList.Add(uint.Parse(string.Join("", hashes[i].Take(8)), System.Globalization.NumberStyles.HexNumber), string.Join("", hashes[i].Skip(9)));
+                                        if (!hashList.Keys.Contains(uint.Parse(string.Join("", hashes[i].Take(8)), System.Globalization.NumberStyles.HexNumber)))
+                                        {
+                                            hashList.Add(uint.Parse(string.Join("", hashes[i].Take(8)), System.Globalization.NumberStyles.HexNumber), string.Join("", hashes[i].Skip(9)));
+                                        }
                                     }
                                 }
                             }
@@ -122,7 +125,10 @@ namespace KirbyMINT
                                     string[] hashes = File.ReadAllLines(args[hindex]);
                                     for (int i = 0; i < hashes.Length; i++)
                                     {
-                                        hashList.Add(uint.Parse(string.Join("", hashes[i].Take(8)), System.Globalization.NumberStyles.HexNumber), string.Join("", hashes[i].Skip(9)));
+                                        if (!hashList.Keys.Contains(uint.Parse(string.Join("", hashes[i].Take(8)), System.Globalization.NumberStyles.HexNumber)))
+                                        {
+                                            hashList.Add(uint.Parse(string.Join("", hashes[i].Take(8)), System.Globalization.NumberStyles.HexNumber), string.Join("", hashes[i].Skip(9)));
+                                        }
                                     }
                                 }
                                 else
