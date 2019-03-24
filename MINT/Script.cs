@@ -293,7 +293,7 @@ namespace MINT
                                         {
                                             uint val = BitConverter.ToUInt32(sdata, v);
                                             string vstring = "0x" + val.ToString("X");
-                                            if (vstring.Length == 10) vstring = BitConverter.ToSingle(sdata, v).ToString() + "f";
+                                            //if (vstring.Length == 10) vstring = BitConverter.ToSingle(sdata, v).ToString() + "f";
                                             cmd += $" {vstring}";
                                             break;
                                         }
@@ -301,7 +301,7 @@ namespace MINT
                                         {
                                             uint val = BitConverter.ToUInt32(sdata, v);
                                             string vstring = "0x" + val.ToString("X");
-                                            if (vstring.Length == 10) vstring = BitConverter.ToSingle(sdata, v).ToString() + "f";
+                                            //if (vstring.Length == 10) vstring = BitConverter.ToSingle(sdata, v).ToString() + "f";
                                             cmd += $" r{z.ToString("X2")}, {vstring}";
                                             break;
                                         }
@@ -1578,7 +1578,7 @@ namespace MINT
                                         {
                                             uint val = InvertEndianness(BitConverter.ToUInt32(sdata, v));
                                             string vstring = "0x" + val.ToString("X");
-                                            if (vstring.Length == 10) vstring = InvertEndianness(BitConverter.ToSingle(sdata, v)).ToString() + "f";
+                                            //if (vstring.Length == 10) vstring = InvertEndianness(BitConverter.ToSingle(sdata, v)).ToString() + "f";
                                             cmd += $" {vstring}";
                                             break;
                                         }
@@ -1586,7 +1586,7 @@ namespace MINT
                                         {
                                             uint val = InvertEndianness(BitConverter.ToUInt32(sdata, v));
                                             string vstring = "0x" + val.ToString("X");
-                                            if (vstring.Length == 10) vstring = InvertEndianness(BitConverter.ToSingle(sdata, v)).ToString() + "f";
+                                            //if (vstring.Length == 10) vstring = InvertEndianness(BitConverter.ToSingle(sdata, v)).ToString() + "f";
                                             cmd += $" r{z.ToString("X2")}, {vstring}";
                                             break;
                                         }
